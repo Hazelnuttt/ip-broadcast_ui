@@ -13,7 +13,7 @@ class Home extends React.Component {
   }
 
   componentDidMount() {
-    fetch('http://localhost:3000/home', {
+    fetch('http://localhost:8099/home', {
       method: 'get',
       headers: {
         token: localStorage.getItem('user_token')

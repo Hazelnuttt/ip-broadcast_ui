@@ -2,8 +2,6 @@ import React from 'react';
 import fetch from 'node-fetch';
 import { Input, Card, Button, Checkbox, Icon } from 'antd';
 import { Redirect } from 'react-router';
-// import {setToken} from '../utils/storage'
-// import Password from 'antd/lib/input/Password';
 
 class Login extends React.Component {
   constructor(props) {
@@ -24,15 +22,16 @@ class Login extends React.Component {
       headers: {
         token: localStorage.getItem('user_token')
       }
-    })
-      .then(res => res.json())
-      .then(res => {
-        const { loginok } = res;
-        if (loginok) {
-          // 已登录，token没过期
-          return <Redirect to="/home" />;
-        }
-      });
+    });
+    // .then(res => res.json())
+    // .then(res => {
+    //   const { loginok } = res;
+    //   if (loginok) {
+    //     // 已登录，token没过期
+    //     return <Redirect to="/home" />;
+    //   }
+    // });
+    console.log('hello');
   }
 
   componentDidMount() {
@@ -54,28 +53,29 @@ class Login extends React.Component {
       headers: {
         'content-type': 'application/json'
       },
-      body: {
+      body: JSON.stringify({
         username,
         password,
         remember
-      }
-    })
-      .then(res => res.json())
-      .then(res => {
-        const { loginSuccess, message, data, ntoken } = res;
-        if (loginSuccess) {
-          // 登录成功处理
+      })
+    });
+    // .then(res => res.json())
+    // .then(res => {
+    //   const { loginSuccess, message, data, ntoken } = res;
+    //   if (loginSuccess) {
+    //     // 登录成功处理
+    //     localStorage.removeItem('usesr_token');
+    //     localStorage.setItem('user_token', ntoken);
 
-          localStorage.setItem('user_token', ntoken);
-
-          //   setToken(ntoken)
-          this.setState({ user: data });
-          return <Redirect to="/home" />;
-        } else {
-          // 登录失败处理
-          message.error(message);
-        }
-      });
+    //     //   setToken(ntoken)
+    //     this.setState({ user: data });
+    //     return <Redirect to="/home" />;
+    //   } else {
+    //     // 登录失败处理
+    //     message.error(message);
+    //   }
+    // });
+    console.log('hello2');
   };
 
   render() {
@@ -111,13 +111,18 @@ class Login extends React.Component {
           >
             记住密码
           </Checkbox>
+          <br />
           <Button
             type="primary"
-            style={{ float: 'right' }}
+            style={{ marginTop: 10 }}
+            block
             onClick={this.handleSubmit}
           >
             登录
           </Button>
+          <a style={{ float: 'right' }} href="">
+            Register
+          </a>
         </Card>
       </div>
     );
