@@ -59,8 +59,8 @@ antd-init
 + eslint+husky+premiter
 这边我快晕了，vscode有插件，这三个东西好有npm，还有规则，我不知道怎么写，npm完，还要配置路径，还是很糊涂····我不知道我这个project的标配是什么啊····
 + 导航栏 单页面切换
-![homedemo](/src/homedemo.png)
-![homedemo2](/src/homedemo2.png)
+![homedemo](D:/antd-demo/src/homedemo.png)
+![homedemo2](D:/antd-demo/src/homedemo2.png)
 + search/reset
 antd 貌似直接做到了，前端，增，删，改，查，今天我就光弄了一个静态search，我本想模仿antd,但是参数实在太多了，不理解，看不懂。不会写查询，后端如果传过来加工，修改好的一组数组，我或许·······
 + 下拉框
