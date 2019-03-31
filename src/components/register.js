@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Button, Card } from 'antd';
+import { Form, Input, Button, Card, message } from 'antd';
 import { Redirect } from 'react-router';
 
 class Register extends React.Component {
@@ -27,14 +27,11 @@ class Register extends React.Component {
         })
           .then(res => res.json())
           .then(res => {
-            const { registerSuccess, message, data, ntoken } = res;
+            const { registerSuccess, message, data } = res;
             if (registerSuccess) {
               // 注册成功处理
-              localStorage.removeItem('usesr_token');
-              localStorage.setItem('user_token', ntoken);
-
               this.setState({ user: data });
-              return <Redirect to="/home" />;
+              return <Redirect to="/login" />;
             } else {
               // 注册失败处理
               message.error(message);
