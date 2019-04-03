@@ -84,6 +84,6 @@ antd 貌似直接做到了，前端，增，删，改，查，今天我就光弄
 因为用的antd,就光光简简单单的的用，点什么就选中什么，加了组件后，选中的问题还没有解决。
 ### 未解决到解决
 + 导航栏单页面切换，终于弄懂了，是`Switch`的坑，这边的知识点下次再写在这里（礼花）
-！[solvehomedemo](https://github.com/Hazelnuttt/antd-demo/blob/master/src/solvehomedemo.png)
+![solvehomedemo](https://github.com/Hazelnuttt/antd-demo/blob/master/src/solvehomedemo.png)
 + 我终于实现了第一次用服务器传过来的json 选取数组对象中需要的对象展示出来，不过这边还是用到了antd的table，所以map学的还不是特别好。还要谢谢学长的一个类似服务器的东西，不过听说后面不用开着啥的，下次问问，长点知识。其实这边有一个选取需要的json字段，再重新组成一个新数组的东西，我再百度上找到了答案，但是心里很难过（难过），因`list.forEach(function(item){arr.push({key: item.id, username:item.username, idens:item.role})});` 你看：`forEach`我知道，是这个用法。`push`我知道，但不知道有提取的用法啊。`item.id`又是个怎么的神仙用法啊。(你需要补会来。。。)
 
