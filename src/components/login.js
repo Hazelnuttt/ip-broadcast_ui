@@ -58,23 +58,23 @@ class Login extends React.Component {
         password,
         remember
       })
-    });
-    // .then(res => res.json())
-    // .then(res => {
-    //   const { loginSuccess, message, data, ntoken } = res;
-    //   if (loginSuccess) {
-    //     // 登录成功处理
-    //     localStorage.removeItem('usesr_token');
-    //     localStorage.setItem('user_token', ntoken);
+    })
+      .then(res => res.json())
+      .then(res => {
+        const { loginSuccess, message, data, ntoken } = res;
+        if (loginSuccess) {
+          // 登录成功处理
+          localStorage.removeItem('usesr_token');
+          localStorage.setItem('user_token', ntoken);
 
-    //     //   setToken(ntoken)
-    //     this.setState({ user: data });
-    //     return <Redirect to="/home" />;
-    //   } else {
-    //     // 登录失败处理
-    //     message.error(message);
-    //   }
-    // });
+          //   setToken(ntoken)
+          this.setState({ user: data });
+          return <Redirect to="/home" />;
+        } else {
+          // 登录失败处理
+          message.error(message);
+        }
+      });
     console.log('hello2');
   };
 

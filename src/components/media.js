@@ -5,9 +5,9 @@ class Media extends React.Component {
   render() {
     return (
       <Home>
-        <section>
-          <h1>Media</h1>
-        </section>
+        {/* <section> */}
+        <h1>Media</h1>
+        {/* </section> */}
       </Home>
     );
   }

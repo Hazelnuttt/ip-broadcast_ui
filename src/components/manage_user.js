@@ -1,169 +1,233 @@
 import React from 'react';
 import Home from './home/home.js';
-import { Form, Input, Button, Select, Icon, Table, Col, Row } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  Icon,
+  Table,
+  Col,
+  Row,
+  message,
+  Pagination,
+  Popconfirm
+} from 'antd';
+import { NavLink } from 'react-router-dom';
+import { Redirect } from 'react-router';
+import fetch from 'node-fetch';
 import './home/home.css';
-import Highlighter from 'react-highlight-words';
+import FormItem from 'antd/lib/form/FormItem';
 const { Option } = Select;
-const data0 = [
-  {
-    key: '1',
-    name: 'A',
-    idens: '管理员',
-    action1: '编辑',
-    action1: ''
-  },
-  {
-    key: '2',
-    name: 'B',
-    idens: '普通用户',
-    action1: '编辑',
-    action2: '删除'
-  },
-  {
-    key: '3',
-    name: 'B',
-    idens: '普通用户',
-    action1: '编辑',
-    action2: '删除'
-  },
-  {
-    key: '4',
-    name: 'A',
-    idens: '管理员',
-    action1: '编辑',
-    action1: ''
-  }
-];
-
-const data1 = [
-  {
-    key: '5',
-    ipname: '123',
-    ip: '123',
-    code: '',
-    volume: '20'
-  },
-  {
-    key: '6',
-    ipname: '123',
-    ip: '123',
-    code: '',
-    volume: '20'
-  },
-  {
-    key: '7',
-    ipname: '123',
-    ip: '123',
-    code: '',
-    volume: '20'
-  },
-  {
-    key: '8',
-    ipname: '123',
-    ip: '123',
-    code: '',
-    volume: '20'
-  }
-];
 
 class Man_user extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: '',
-      searchText: ''
+      idens: '',
+      username: '',
+      data0: [],
+      total: '',
+      pagination: {},
+      loading: false
     };
+    this.handleIdentifyChange = this.handleIdentifyChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
-  // handleSearch = (e) => {
-  //     e.preventDefault();
-  //     this.props.form.validateFields((err, values) => {
-  //       console.log('Received values of form: ', values);
-  //     });
-  //   }
+  getData() {
+    this.setState({ loading: true });
+    fetch('http://198.13.50.147:8099/api/user/', {
+      method: 'get',
+      headers: {
+        token: localStorage.getItem('user_token')
+      }
+    })
+      .then(res => res.json())
+      .then(res => {
+        const { list, navigatepageNums, total } = res;
+        const { pagination } = this.state;
+        pagination.pages = navigatepageNums.pages;
+        pagination.pageSize = navigatepageNums.pageSize;
+        pagination.pageNum = navigatepageNums.pageNum;
+        const arr = [];
+        list.forEach(function(item) {
+          arr.push({ key: item.id, username: item.username, idens: item.role });
+        });
+        this.setState({
+          data0: arr,
+          loading: false,
+          pagination,
+          total
+        });
+      });
+  }
 
-  // handleReset = () => {
-  //     this.props.form.resetFields();
-  //   }
+  componentDidMount() {
+    this.getData();
+  }
+
+  //可能有问题
+  handleIdentifyChange = value => {
+    this.setState({
+      idens: value
+    });
+  };
+
+  handleChange = e => {
+    this.setState({ username: e.target.value });
+  };
+
+  handleSearch() {
+    fetch('http://198.13.50.147:8099/api/user/findby', {
+      method: 'get',
+      headers: {
+        token: localStorage.getItem('user_token')
+      }
+    })
+      .then(res => res.json())
+      .then(res => {
+        const { list, navigatepageNums } = res;
+        const { pagination } = this.state;
+        pagination.total = navigatepageNums.pages;
+        pagination.placeholder = navigatepageNums.pageSize;
+        pagination.pages = navigatepageNums.pages;
+        const arr = [];
+        list.forEach(function(item) {
+          arr.push({ key: item.id, username: item.username, idens: item.role });
+        });
+        this.setState({
+          data0: arr,
+          loading: false,
+          pagination
+        });
+      });
+  }
+
+  handleDelete = key => {
+    fetch(`http://198.13.50.147:8099/api/user/delete/${key}`, {
+      method: 'get',
+      headers: {
+        token: localStorage.getItem('user_token')
+      }
+    });
+    const data0 = [...this.state.data0];
+    this.setState({ data0: data0.filter(item => item.key !== key) });
+  };
 
   render() {
-    const { name } = this.state;
-    const columns1 = [
+    const { username, data0, pagination, total } = this.state;
+    const columns = [
       {
         title: '用户名称',
-        dataIndex: 'name',
-        key: 'name',
+        dataIndex: 'username',
+        // key: 'username',
         width: '25%'
-        //   ...this.getColumnSearchProps('name')
       },
       {
         title: '用户类别',
         dataIndex: 'idens',
-        key: 'idens',
+        // key: 'idens',
+        filters: [
+          { text: '全部', value: '' },
+          { text: '普通用户', value: 'ROLE_USER' },
+          { text: '管理员', value: 'ROLE_ADMIN' },
+          { text: 'SIP', value: 'ROLE_SIP' }
+        ],
         width: '25%'
-        //   ...this.getColumnSearchProps('age')
       },
       {
         title: '编辑',
-        dataIndex: 'action1',
-        key: 'action1',
-        width: '25%'
-        //   ...this.getColumnSearchProps('action')
+        dataIndex: '',
+        // key: 'x',
+        render: () => <NavLink to="/home/media">edit</NavLink>
       },
       {
         title: '删除',
-        dataIndex: 'action2',
-        key: 'action2',
-        width: '25%'
-        // ...this.getColumnSearchProps('action')
+        dataIndex: '',
+        key: 'y',
+        render: data0 => (
+          <Popconfirm
+            title="Sure to delete?"
+            onConfirm={() => this.handleDelete(data0.key)}
+          >
+            <a href="javascript:;">Delete</a>
+          </Popconfirm>
+        )
       }
     ];
-    const columns2 = [
-      {
-        title: '终端名称',
-        dataIndex: 'ipname',
-        key: 'ipname',
-        width: '30%'
-        //   ...this.getColumnSearchProps('name')
-      },
-      {
-        title: 'IP地址',
-        dataIndex: 'ip',
-        key: 'ip',
-        width: '30%'
-        //   ...this.getColumnSearchProps('age')
-      },
-      {
-        title: '呼叫编码',
-        dataIndex: 'code',
-        key: 'code',
-        width: '15%'
-        //   ...this.getColumnSearchProps('action')
-      },
-      {
-        title: '终端默认音量',
-        dataIndex: 'volume',
-        key: 'volume',
-        width: '25%'
-        //   ...this.getColumnSearchProps('action')
-      }
-    ];
+
     return (
       <Home>
-        <section>
-          <Row>
-            <Col span={9}>
-              <Table columns={columns1} dataSource={data0} />
-            </Col>
-            <Col span={15}>
-              <Table columns={columns2} dataSource={data1} />
-            </Col>
-          </Row>
-        </section>
+        <Col className={'twofun'}>
+          <span>
+            <Icon type="sync" />
+            <NavLink to="/home/user/index">刷新</NavLink>
+          </span>{' '}
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <span>
+            <Icon type="plus" />
+            <NavLink to="/home/user/update">新建</NavLink>{' '}
+          </span>
+        </Col>
+        <div className={'search'}>
+          <Form layout="inline">
+            <Form.Item layout="inline" label={'综合筛选'}>
+              <Input
+                placeholder="用户名称"
+                value={username}
+                onChange={this.handleChange}
+              />
+            </Form.Item>
+
+            <Form.Item layout="inline" label={'用户角色'}>
+              <Select
+                defaultValue={''}
+                style={{ width: 100 }}
+                onChange={this.handleIdentifyChange}
+              >
+                {/* {identifyDatas.map(identifyData => (
+                      <Option key={identifyData}>{identifyData}</Option>
+                    ))} */}
+                <Option value="">全部</Option>
+                <Option value="ROLE_USER">普通用户</Option>
+                <Option value="ROLE_ADMIN">管理员</Option>
+                <Option value="ROLE_SIP">SIP</Option>
+              </Select>
+            </Form.Item>
+
+            <FormItem layout="inline">
+              <Button
+                type="primary"
+                onClick={this.handleSearch}
+                style={{ marginRight: 10 }}
+              >
+                查询
+              </Button>
+              <Button
+                type="primary"
+                // onClick={this.handleReset}
+                style={{ marginRight: 10 }}
+              >
+                重置
+              </Button>
+            </FormItem>
+          </Form>
+
+          <div className={'location'}>全部用户-{total}</div>
+        </div>
+        <div className="content">
+          <Table
+            columns={columns}
+            dataSource={data0}
+            pagination={{ pageSize: pagination[2] }}
+            loading={this.state.loading}
+            scroll={{ y: 350 }}
+          />
+        </div>
       </Home>
     );
   }
 }
 
-export default Form.create()(Man_user);
+export default Man_user;

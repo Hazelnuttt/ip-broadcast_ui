@@ -2,6 +2,7 @@ import { Menu, Icon, Col } from 'antd';
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { NavLink } from 'react-router-dom';
+import './home.css';
 
 const SubMenu = Menu.SubMenu;
 
@@ -35,7 +36,8 @@ class Sider extends React.Component {
         defaultSelectedKeys={['1']}
         openKeys={this.state.openKeys}
         onOpenChange={this.onOpenChange}
-        // style={{ width: 256,height:920 }}
+        //
+        className={'menu'}
       >
         <Menu.Item key="1">
           <NavLink to="/home">
@@ -46,7 +48,7 @@ class Sider extends React.Component {
           </NavLink>
         </Menu.Item>
         <Menu.Item key="2">
-          <NavLink to="/home/user">
+          <NavLink to="/home/user/index">
             <span>
               <Icon type="solution" />
               <span>用户管理</span>
@@ -122,10 +124,12 @@ class Sider extends React.Component {
           </span>
         </Menu.Item>
         <Menu.Item key="15">
-          <span>
-            <Icon type="mobile" />
-            <span>媒体库</span>
-          </span>
+          <NavLink to="/home/media">
+            <span>
+              <Icon type="mobile" />
+              <span>媒体库</span>
+            </span>
+          </NavLink>
         </Menu.Item>
         <Menu.Item key="16">
           <span>
