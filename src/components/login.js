@@ -1,9 +1,7 @@
 import React from 'react';
 import fetch from 'node-fetch';
-import { Input, Card, Button, Checkbox, Icon } from 'antd';
+import { Input, Card, Button, Checkbox, Icon, message } from 'antd';
 import { Redirect } from 'react-router';
-// import {setToken} from '../utils/storage'
-// import Password from 'antd/lib/input/Password';
 
 class Login extends React.Component {
   constructor(props) {
@@ -19,7 +17,7 @@ class Login extends React.Component {
   }
 
   getHome() {
-    fetch('http://localhost:3000/home', {
+    fetch('http://198.13.50.147:8099/api/auth/login', {
       method: 'get',
       headers: {
         token: localStorage.getItem('user_token')
@@ -30,13 +28,14 @@ class Login extends React.Component {
         const { loginok } = res;
         if (loginok) {
           // 已登录，token没过期
-          return <Redirect to="/home" />;
+          return <Redirect to="/home/user/index" />;
         }
       });
+    // console.log('hello');
   }
 
   componentDidMount() {
-    this.getHome();
+    // this.getHome();
   }
 
   setToken(ntoken) {
@@ -49,31 +48,30 @@ class Login extends React.Component {
 
   handleSubmit = () => {
     const { username, password, remember } = this.state;
-    fetch('http://localhost:3000/login', {
+    fetch('http://198.13.50.147:8099/api/auth/login', {
       method: 'post',
       headers: {
-        'content-type': 'application/json'
-      },
-      body: {
+        // 'Accept':'application/json', //接收
+        'Content-Type': 'application/json'
+      }, //这两个东西不知道是哪个去接收
+      body: JSON.stringify({
         username,
         password,
         remember
-      }
+      })
     })
       .then(res => res.json())
       .then(res => {
-        const { loginSuccess, message, data, ntoken } = res;
+        const { loginSuccess, message1, token } = res;
         if (loginSuccess) {
           // 登录成功处理
-
-          localStorage.setItem('user_token', ntoken);
-
-          //   setToken(ntoken)
-          this.setState({ user: data });
-          return <Redirect to="/home" />;
+          localStorage.removeItem('usesr_token');
+          localStorage.setItem('user_token', token);
+          // this.setState({ user: data });
+          return <Redirect to="/home/user/index" />;
         } else {
           // 登录失败处理
-          message.error(message);
+          message.error(message1);
         }
       });
   };
@@ -111,13 +109,18 @@ class Login extends React.Component {
           >
             记住密码
           </Checkbox>
+          <br />
           <Button
             type="primary"
-            style={{ float: 'right' }}
+            style={{ marginTop: 10 }}
+            block
             onClick={this.handleSubmit}
           >
             登录
           </Button>
+          <a style={{ float: 'right' }} href="">
+            Register
+          </a>
         </Card>
       </div>
     );
