@@ -1,6 +1,6 @@
 import React from 'react';
 import fetch from 'node-fetch';
-import { Input, Card, Button, Checkbox, Icon } from 'antd';
+import { Input, Card, Button, Checkbox, Icon, message } from 'antd';
 import { Redirect } from 'react-router';
 
 class Login extends React.Component {
@@ -17,25 +17,25 @@ class Login extends React.Component {
   }
 
   getHome() {
-    fetch('http://localhost:3000/home', {
+    fetch('http://198.13.50.147:8099/api/auth/login', {
       method: 'get',
       headers: {
         token: localStorage.getItem('user_token')
       }
-    });
-    // .then(res => res.json())
-    // .then(res => {
-    //   const { loginok } = res;
-    //   if (loginok) {
-    //     // 已登录，token没过期
-    //     return <Redirect to="/home" />;
-    //   }
-    // });
-    console.log('hello');
+    })
+      .then(res => res.json())
+      .then(res => {
+        const { loginok } = res;
+        if (loginok) {
+          // 已登录，token没过期
+          return <Redirect to="/home/user/index" />;
+        }
+      });
+    // console.log('hello');
   }
 
   componentDidMount() {
-    this.getHome();
+    // this.getHome();
   }
 
   setToken(ntoken) {
@@ -48,11 +48,12 @@ class Login extends React.Component {
 
   handleSubmit = () => {
     const { username, password, remember } = this.state;
-    fetch('http://localhost:3000/login', {
+    fetch('http://198.13.50.147:8099/api/auth/login', {
       method: 'post',
       headers: {
-        'content-type': 'application/json'
-      },
+        // 'Accept':'application/json', //接收
+        'Content-Type': 'application/json'
+      }, //这两个东西不知道是哪个去接收
       body: JSON.stringify({
         username,
         password,
@@ -61,21 +62,18 @@ class Login extends React.Component {
     })
       .then(res => res.json())
       .then(res => {
-        const { loginSuccess, message, data, ntoken } = res;
+        const { loginSuccess, message1, token } = res;
         if (loginSuccess) {
           // 登录成功处理
           localStorage.removeItem('usesr_token');
-          localStorage.setItem('user_token', ntoken);
-
-          //   setToken(ntoken)
-          this.setState({ user: data });
-          return <Redirect to="/home" />;
+          localStorage.setItem('user_token', token);
+          // this.setState({ user: data });
+          return <Redirect to="/home/user/index" />;
         } else {
           // 登录失败处理
-          message.error(message);
+          message.error(message1);
         }
       });
-    console.log('hello2');
   };
 
   render() {

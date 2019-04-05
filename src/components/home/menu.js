@@ -40,7 +40,7 @@ class Sider extends React.Component {
         className={'menu'}
       >
         <Menu.Item key="1">
-          <NavLink to="/home">
+          <NavLink to="/home/user/index">
             <span>
               <Icon type="home" />
               <span>主面板</span>

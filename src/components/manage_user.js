@@ -37,9 +37,10 @@ class Man_user extends React.Component {
 
   getData() {
     this.setState({ loading: true });
-    fetch('http://198.13.50.147:8099/api/user/', {
+    fetch('http://198.13.50.147:8099/api/user', {
       method: 'get',
       headers: {
+        'Content-Type': 'application/json',
         token: localStorage.getItem('user_token')
       }
     })
@@ -79,7 +80,7 @@ class Man_user extends React.Component {
   };
 
   handleSearch() {
-    fetch('http://198.13.50.147:8099/api/user/findby', {
+    fetch('http://198.13.50.147:8099/api/user/findby/', {
       method: 'get',
       headers: {
         token: localStorage.getItem('user_token')
