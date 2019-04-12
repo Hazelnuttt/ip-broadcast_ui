@@ -17,7 +17,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import { NavLink } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import fetch from 'node-fetch';
-import './home/home.css';
+import '../home/home.css';
 import { USER_INFO_URL, USER_F_URL, USER_D_URL } from '../../utils/api';
 
 const { Option } = Select;

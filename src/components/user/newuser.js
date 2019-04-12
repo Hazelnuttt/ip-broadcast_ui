@@ -1,12 +1,12 @@
 import React from 'react';
-import Home from '../components/home/home.js';
+import Home from '../home/home.js';
 import fetch from 'node-fetch';
 import { Redirect } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Input, Card, Icon, Radio, Button, message, Form, Select } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
-import './home/home.css';
-import { USER_A_URL } from '../utils/api';
+import '../home/home.css';
+import { USER_A_URL } from '../../utils/api';
 const { Option } = Select;
 const RadioGroup = Radio.Group;
 
