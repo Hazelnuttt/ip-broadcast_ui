@@ -56,7 +56,7 @@ class Sider extends React.Component {
           </NavLink>
         </Menu.Item>
         <Menu.Item key="3">
-          <NavLink to="/home/ter">
+          <NavLink to="/home/ter/add">
             <span>
               <Icon type="switcher" />
               <span>终端管理</span>

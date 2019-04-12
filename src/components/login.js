@@ -22,20 +22,31 @@ class Login extends React.Component {
       headers: {
         token: localStorage.getItem('user_token')
       }
-    })
-      .then(res => res.json())
-      .then(res => {
-        const { loginok } = res;
-        if (loginok) {
-          // 已登录，token没过期
-          return <Redirect to="/home/user/index" />;
-        }
-      });
-    // console.log('hello');
+    });
+    //   .then(res => res.json())
+    //   .then(res => {
+    //     const { loginok } = res;
+    //     if (loginok) {
+    //       // 已登录，token没过期
+    //       return <Redirect to="/home/user/index" />;
+    //     }
+    //   });
+    // // console.log('hello');
+    // .then(res => {
+    //   const headers = res.headers
+    //   const token = headers.token
+    //   console.log(token)
+    //   if (token) {
+    //     return <Redirect to="/home/user/index" />
+    //   }
+    // })
+    // .catch(err => {
+    //   console.error(err)
+    // })
   }
 
   componentDidMount() {
-    // this.getHome();
+    this.getHome();
   }
 
   setToken(ntoken) {
@@ -48,37 +59,72 @@ class Login extends React.Component {
 
   handleSubmit = () => {
     const { username, password, remember } = this.state;
+    // var student = new Object()
+    // student.username = 'sa'
+    // student.password = '123ujs'
+    // student.rememberMe = true
+
+    // var json = JSON.stringify(student)
+
+    // $.ajax(
+    //   {
+    //     url:"http://198.13.50.147:8099/api/auth/login",
+    //     method:'post',
+    //     contentType:'application/json',
+    //     dataType:'json',
+    //     data:JSON.stringify({
+    //       student
+    //     }),
+    //     success:res=>{
+    //       console.log(res);
+    //     }
+    //   }
+    // )
+
+    // console.log(json)
     fetch('http://198.13.50.147:8099/api/auth/login', {
-      method: 'post',
+      method: 'POST',
       headers: {
+        // Authorization:
+        // 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJST0xFIjoiUk9MRV9BRE1JTiIsInN1YiI6ImFkbWluNyIsImlzcyI6InVqcyIsImV4cCI6MTU1NTQxODA2OSwiaWF0IjoxNTU0ODEzMjY5fQ.PN3jwbWjrQg9Z_X8JR377NNuHK8ZXejHK4uXZm3scJ1sLZCUMwb5yBg7vfR_TjaVzkg_Z_9y3gxZ65MH-GtteA',
         // 'Accept':'application/json', //接收
         'Content-Type': 'application/json'
       }, //这两个东西不知道是哪个去接收
       body: JSON.stringify({
-        username,
-        password,
-        remember
+        username: 'sa',
+        password: '123ujs',
+        rememberMe: true
       })
     })
-      .then(res => res.json())
       .then(res => {
-        const { loginSuccess, message1, token } = res;
-        if (loginSuccess) {
+        console.log(res);
+        //return res;
+      })
+      .then(res => {
+        // console.log(res)
+        // const headers = res.headers
+        // console.log(res.headers)
+        // const token = headers.get('token')
+        // console.log(token)
+
+        const { token, message } = res;
+        if (token) {
           // 登录成功处理
           localStorage.removeItem('usesr_token');
           localStorage.setItem('user_token', token);
           // this.setState({ user: data });
           return <Redirect to="/home/user/index" />;
         } else {
+          // const headers = res.headers
+          // const message = headers.message
           // 登录失败处理
-          message.error(message1);
+          message.error(message);
         }
       });
   };
 
   render() {
     const { username, password, remember } = this.state;
-    //console.log('hello')
     return (
       <div style={{ margin: 100 }}>
         <h1 style={{ textAlign: 'center' }}>登录</h1>

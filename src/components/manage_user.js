@@ -24,7 +24,7 @@ class Man_user extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      idens: '',
+      role: '',
       username: '',
       data0: [],
       total: '',
@@ -41,19 +41,21 @@ class Man_user extends React.Component {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',
-        token: localStorage.getItem('user_token')
+        // token: localStorage.getItem('user_token')
+        Authorization:
+          'Bearer eyJhbGciOiJIUzUxMiJ9.eyJST0xFIjoiUk9MRV9TSVAiLCJzdWIiOiJzYSIsImlzcyI6InVqcyIsImV4cCI6MTU1NTQxOTc4MiwiaWF0IjoxNTU0ODE0OTgyfQ.4XZrKueziyVUcuzBuC84w_yy7hLB_Mur5xEjMcezE2ZFnra6EIYrPpltQvLR4BCjCRNDqelwO32P8_HqjOZ5uQ'
       }
     })
       .then(res => res.json())
       .then(res => {
-        const { list, navigatepageNums, total } = res;
+        const { list, pages, pageNum, pageSize, total } = res;
         const { pagination } = this.state;
-        pagination.pages = navigatepageNums.pages;
-        pagination.pageSize = navigatepageNums.pageSize;
-        pagination.pageNum = navigatepageNums.pageNum;
+        pagination.pages = pages;
+        pagination.pageSize = pageSize;
+        pagination.pageNum = pageNum;
         const arr = [];
         list.forEach(function(item) {
-          arr.push({ key: item.id, username: item.username, idens: item.role });
+          arr.push({ key: item.id, username: item.username, role: item.role });
         });
         this.setState({
           data0: arr,
@@ -61,6 +63,9 @@ class Man_user extends React.Component {
           pagination,
           total
         });
+      })
+      .catch(err => {
+        console.error(err);
       });
   }
 
@@ -71,7 +76,7 @@ class Man_user extends React.Component {
   //可能有问题
   handleIdentifyChange = value => {
     this.setState({
-      idens: value
+      role: value
     });
   };
 
@@ -79,15 +84,26 @@ class Man_user extends React.Component {
     this.setState({ username: e.target.value });
   };
 
-  handleSearch() {
-    fetch('http://198.13.50.147:8099/api/user/findby/', {
-      method: 'get',
+  handleSearch = () => {
+    const { username, role } = this.state;
+    fetch('http://198.13.50.147:8099/api/user/findby', {
+      method: 'post',
       headers: {
-        token: localStorage.getItem('user_token')
-      }
+        'Content-Type': 'application/json',
+        // token: localStorage.getItem('user_token')
+        Authorization:
+          'Bearer eyJhbGciOiJIUzUxMiJ9.eyJST0xFIjoiUk9MRV9TSVAiLCJzdWIiOiJzYSIsImlzcyI6InVqcyIsImV4cCI6MTU1NTQxOTc4MiwiaWF0IjoxNTU0ODE0OTgyfQ.4XZrKueziyVUcuzBuC84w_yy7hLB_Mur5xEjMcezE2ZFnra6EIYrPpltQvLR4BCjCRNDqelwO32P8_HqjOZ5uQ'
+      },
+      body: JSON.stringify({
+        username,
+        role
+      })
     })
       .then(res => res.json())
       .then(res => {
+        // console.log(res)
+        // console.log(role)
+        // console.log(username)
         const { list, navigatepageNums } = res;
         const { pagination } = this.state;
         pagination.total = navigatepageNums.pages;
@@ -95,29 +111,59 @@ class Man_user extends React.Component {
         pagination.pages = navigatepageNums.pages;
         const arr = [];
         list.forEach(function(item) {
-          arr.push({ key: item.id, username: item.username, idens: item.role });
+          arr.push({ key: item.id, username: item.username, role: item.role });
         });
         this.setState({
           data0: arr,
           loading: false,
           pagination
         });
+      })
+      .catch(err => {
+        console.log(err);
       });
-  }
+  };
 
   handleDelete = key => {
     fetch(`http://198.13.50.147:8099/api/user/delete/${key}`, {
       method: 'get',
       headers: {
-        token: localStorage.getItem('user_token')
+        // token: localStorage.getItem('user_token')
+        Authorization:
+          'Bearer eyJhbGciOiJIUzUxMiJ9.eyJST0xFIjoiUk9MRV9TSVAiLCJzdWIiOiJzYSIsImlzcyI6InVqcyIsImV4cCI6MTU1NTQxOTc4MiwiaWF0IjoxNTU0ODE0OTgyfQ.4XZrKueziyVUcuzBuC84w_yy7hLB_Mur5xEjMcezE2ZFnra6EIYrPpltQvLR4BCjCRNDqelwO32P8_HqjOZ5uQ'
       }
     });
+    console.log(key);
     const data0 = [...this.state.data0];
     this.setState({ data0: data0.filter(item => item.key !== key) });
   };
 
+  handleReset = () => {
+    this.setState({
+      username: '',
+      role: ''
+    });
+  };
+
+  // handleEdit = data0 => {
+  //   console.log(data0)
+  //   this.props.data_edit(data0)
+  //   this.props.visible(true)
+  // }
+
+  // handleEdit = data0 => {
+  //   fetch('http://198.13.50.147:8099/api/user/update', {
+  //     method: 'post',
+  //     headers: {
+  //       // token: localStorage.getItem('user_token')
+  //       Authorization:
+  //         'Bearer eyJhbGciOiJIUzUxMiJ9.eyJST0xFIjoiUk9MRV9TSVAiLCJzdWIiOiJzYSIsImlzcyI6InVqcyIsImV4cCI6MTU1NTQxOTc4MiwiaWF0IjoxNTU0ODE0OTgyfQ.4XZrKueziyVUcuzBuC84w_yy7hLB_Mur5xEjMcezE2ZFnra6EIYrPpltQvLR4BCjCRNDqelwO32P8_HqjOZ5uQ'
+  //     }
+  //   })
+  // }
+
   render() {
-    const { username, data0, pagination, total } = this.state;
+    const { username, data0, pagination, total, role } = this.state;
     const columns = [
       {
         title: '用户名称',
@@ -127,21 +173,23 @@ class Man_user extends React.Component {
       },
       {
         title: '用户类别',
-        dataIndex: 'idens',
-        // key: 'idens',
-        filters: [
-          { text: '全部', value: '' },
-          { text: '普通用户', value: 'ROLE_USER' },
-          { text: '管理员', value: 'ROLE_ADMIN' },
-          { text: 'SIP', value: 'ROLE_SIP' }
-        ],
+        dataIndex: 'role',
+        // key: 'role',
         width: '25%'
       },
       {
         title: '编辑',
         dataIndex: '',
-        // key: 'x',
-        render: () => <NavLink to="/home/media">edit</NavLink>
+        key: 'x',
+        render: data0 => (
+          <NavLink
+            to="/home/user/update"
+            onClick={() => this.handleEdit(data0.key)}
+          >
+            edit
+          </NavLink> //这个组件 不知道算不算子组件，
+          //home.js {this.props.children} 传值失败
+        )
       },
       {
         title: '删除',
@@ -183,7 +231,7 @@ class Man_user extends React.Component {
 
             <Form.Item layout="inline" label={'用户角色'}>
               <Select
-                defaultValue={''}
+                value={role}
                 style={{ width: 100 }}
                 onChange={this.handleIdentifyChange}
               >
@@ -207,7 +255,7 @@ class Man_user extends React.Component {
               </Button>
               <Button
                 type="primary"
-                // onClick={this.handleReset}
+                onClick={this.handleReset}
                 style={{ marginRight: 10 }}
               >
                 重置

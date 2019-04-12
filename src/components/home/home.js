@@ -5,6 +5,13 @@ import Sider from '../home/menu.js';
 import './home.css';
 
 class Home extends React.Component {
+  // constructor(props) {
+  //   super(props)
+  //   this.state = {
+  //     data_edit: [],
+  //     visible: false
+  //   }
+  // }
   render() {
     const menu = (
       <Menu>

@@ -23,10 +23,14 @@ class Newuser extends React.Component {
   }
 
   componentDidMount() {
+    // console.log(this.props.visible)
+    // console.log(this.props.data_edit)
     fetch('http://198.13.50.147:8099/api/user/add', {
       method: 'get',
       headers: {
-        token: localStorage.getItem('user_token')
+        // token: localStorage.getItem('user_token')
+        Authorization:
+          'Bearer eyJhbGciOiJIUzUxMiJ9.eyJST0xFIjoiUk9MRV9TSVAiLCJzdWIiOiJzYSIsImlzcyI6InVqcyIsImV4cCI6MTU1NTQxOTc4MiwiaWF0IjoxNTU0ODE0OTgyfQ.4XZrKueziyVUcuzBuC84w_yy7hLB_Mur5xEjMcezE2ZFnra6EIYrPpltQvLR4BCjCRNDqelwO32P8_HqjOZ5uQ'
       }
     })
       .then(res => res.json())
@@ -62,7 +66,10 @@ class Newuser extends React.Component {
     fetch('http://198.13.50.147:8099/api/user/add', {
       method: 'post',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        // token: localStorage.getItem('user_token'),
+        Authorization:
+          'Bearer eyJhbGciOiJIUzUxMiJ9.eyJST0xFIjoiUk9MRV9TSVAiLCJzdWIiOiJzYSIsImlzcyI6InVqcyIsImV4cCI6MTU1NTQxOTc4MiwiaWF0IjoxNTU0ODE0OTgyfQ.4XZrKueziyVUcuzBuC84w_yy7hLB_Mur5xEjMcezE2ZFnra6EIYrPpltQvLR4BCjCRNDqelwO32P8_HqjOZ5uQ'
       },
       body: JSON.stringify({
         username,
@@ -72,13 +79,10 @@ class Newuser extends React.Component {
     })
       .then(res => res.json())
       .then(res => {
-        const { loginSuccess, message1, ntoken } = res;
+        const { loginSuccess, message1 } = res;
         if (loginSuccess) {
           // 登录成功处理
-          localStorage.removeItem('usesr_token');
-          localStorage.setItem('user_token', ntoken);
-
-          //   setToken(ntoken)
+          // 一个参数也不知···········
           return <Redirect to="/home/user/index" />;
         } else {
           // 登录失败处理
@@ -89,6 +93,8 @@ class Newuser extends React.Component {
   };
 
   render() {
+    //  console.log(this.props.visible)
+    // console.log(this.props.data_edit)
     const { username, password } = this.state;
     //console.log('hello')
     return (
@@ -103,7 +109,9 @@ class Newuser extends React.Component {
             <label>用户名</label>
             <Input
               onChange={e => this.handleChange({ username: e.target.value })}
-              value={username}
+              value={
+                this.props.visible ? this.props.data_edit.username : username
+              }
               style={{ margin: '5px 0' }}
               placeholder="Enter your username"
               prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
@@ -111,7 +119,9 @@ class Newuser extends React.Component {
             <label>登录密码</label>
             <Input.Password
               onChange={e => this.handleChange({ password: e.target.value })}
-              value={password}
+              value={
+                this.props.visible ? this.props.data_edit.password : password
+              }
               style={{ margin: '5px 0' }}
               placeholder="Enter your username"
               prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
