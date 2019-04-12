@@ -8,9 +8,7 @@ import {
   Icon,
   Table,
   Col,
-  Row,
   message,
-  Pagination,
   Popconfirm
 } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
@@ -19,19 +17,18 @@ import { Redirect } from 'react-router';
 import fetch from 'node-fetch';
 import '../home/home.css';
 import { USER_INFO_URL, USER_F_URL, USER_D_URL } from '../../utils/api';
-
 const { Option } = Select;
 
 class Man_user extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      loading: false,
       role: '',
       username: '',
       data0: [],
       total: '',
-      pagination: {},
-      loading: false
+      pagination: {}
     };
     this.handleIdentifyChange = this.handleIdentifyChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -68,6 +65,12 @@ class Man_user extends React.Component {
       })
       .catch(err => {
         console.error(err);
+        message.error('网络请求异常!');
+      })
+      .finally(() => {
+        this.setState({
+          loading: false
+        });
       });
   }
 
@@ -86,7 +89,8 @@ class Man_user extends React.Component {
     this.setState({ username: e.target.value });
   };
 
-  handleSearch = () => {
+  handleSearch = e => {
+    e.preventDefault();
     const { username, role } = this.state;
     fetch(USER_F_URL, {
       method: 'post',
@@ -117,12 +121,12 @@ class Man_user extends React.Component {
         });
         this.setState({
           data0: arr,
-          loading: false,
           pagination
         });
       })
       .catch(err => {
         console.log(err);
+        message.error('网络请求异常!');
       });
   };
 
@@ -134,8 +138,11 @@ class Man_user extends React.Component {
         Authorization:
           'Bearer eyJhbGciOiJIUzUxMiJ9.eyJST0xFIjoiUk9MRV9TSVAiLCJzdWIiOiJzYSIsImlzcyI6InVqcyIsImV4cCI6MTU1NTQxOTc4MiwiaWF0IjoxNTU0ODE0OTgyfQ.4XZrKueziyVUcuzBuC84w_yy7hLB_Mur5xEjMcezE2ZFnra6EIYrPpltQvLR4BCjCRNDqelwO32P8_HqjOZ5uQ'
       }
+    }).catch(err => {
+      console.log(err);
+      message.error('网络请求异常!');
     });
-    console.log(key);
+    // console.log(key)
     const data0 = [...this.state.data0];
     this.setState({ data0: data0.filter(item => item.key !== key) });
   };

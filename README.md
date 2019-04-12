@@ -202,6 +202,7 @@ handleSubmit = () => {
 ```
 
 - 9、微调音量的一个组件没有
+
 - 10、发现个奇怪的事情，跟上面的路由坑 2 应该有关，如果不要下面第一条路由，直接引用`component={Man_ter}`这个组件，应该也可以解决上面的路由问题
 
 ```javascript
@@ -210,6 +211,52 @@ handleSubmit = () => {
           <Route path="/home/ter/add" component={Newter} />
           <Route path="/home/ter/edit_single" component={Single_edit} />
           <Route path="/home/ter/edit_batch" component={Batch_edit} />
+```
+
+- 11、编辑时，保留原始数据——子组件、父组件传数据失败
+  ![component_communicate](https://github.com/Hazelnuttt/antd-demo/blob/master/docs/component_communicate.png)
+
+```javascript
+//home.js
+//我看文档是在home.js里写了子组件，但是我的情况，并没有，并不是这样的
+class Home extends React.Component{
+  constructor(props) {
+    super(props)
+    this.state = {
+      data_edit: [],
+    }
+  } //编辑、新建共用一个组件
+
+  render(){
+    return(
+      //这里我是没有的
+      <A value={this.props.xxxx}/>
+      <B value={this.props.xxxx}/>
+    )
+  }
+}
+```
+
+```javascript
+class A extends React.Component{
+  constructor(props) {
+    this.state = {
+      data_edit: [],
+    }
+  }
+
+================
+}
+```
+
+```javascript
+class B extends React.Component{
+  constructor(props) {
+
+  }
+
+================
+}
 ```
 
 ### 未解决到解决
@@ -230,3 +277,6 @@ handleSubmit = () => {
 | 6    | 💩   | 👤               |
 | 7    | 💩   | 👤               |
 | 8    | 💩   | 👤               |
+| 9    | 💩   | 👤               |
+| 10   | 💩   | 👤               |
+| 11   | 💩   | 👤               |
