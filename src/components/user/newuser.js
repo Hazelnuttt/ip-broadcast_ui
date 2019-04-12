@@ -1,11 +1,12 @@
 import React from 'react';
-import Home from './home/home.js';
+import Home from '../components/home/home.js';
 import fetch from 'node-fetch';
 import { Redirect } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Input, Card, Icon, Radio, Button, message, Form, Select } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import './home/home.css';
+import { USER_A_URL } from '../utils/api';
 const { Option } = Select;
 const RadioGroup = Radio.Group;
 
@@ -25,7 +26,7 @@ class Newuser extends React.Component {
   componentDidMount() {
     // console.log(this.props.visible)
     // console.log(this.props.data_edit)
-    fetch('http://198.13.50.147:8099/api/user/add', {
+    fetch(USER_A_URL, {
       method: 'get',
       headers: {
         // token: localStorage.getItem('user_token')
@@ -63,7 +64,7 @@ class Newuser extends React.Component {
 
   handleSubmit = () => {
     const { username, password, remember } = this.state;
-    fetch('http://198.13.50.147:8099/api/user/add', {
+    fetch(USER_A_URL, {
       method: 'post',
       headers: {
         'content-type': 'application/json',

@@ -1,5 +1,5 @@
 import React from 'react';
-import Home from './home/home.js';
+import Home from '../home/home.js';
 import {
   Form,
   Input,
@@ -13,11 +13,13 @@ import {
   Pagination,
   Popconfirm
 } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import { NavLink } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import fetch from 'node-fetch';
 import './home/home.css';
-import FormItem from 'antd/lib/form/FormItem';
+import { USER_INFO_URL, USER_F_URL, USER_D_URL } from '../../utils/api';
+
 const { Option } = Select;
 
 class Man_user extends React.Component {
@@ -37,7 +39,7 @@ class Man_user extends React.Component {
 
   getData() {
     this.setState({ loading: true });
-    fetch('http://198.13.50.147:8099/api/user', {
+    fetch(USER_INFO_URL, {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',
@@ -86,7 +88,7 @@ class Man_user extends React.Component {
 
   handleSearch = () => {
     const { username, role } = this.state;
-    fetch('http://198.13.50.147:8099/api/user/findby', {
+    fetch(USER_F_URL, {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
@@ -125,7 +127,7 @@ class Man_user extends React.Component {
   };
 
   handleDelete = key => {
-    fetch(`http://198.13.50.147:8099/api/user/delete/${key}`, {
+    fetch(USER_D_URL + `${key}`, {
       method: 'get',
       headers: {
         // token: localStorage.getItem('user_token')
