@@ -2,6 +2,13 @@
 
 > 我发誓：这一篇将成为我最后一篇用中文写的 Readme
 
+## 心得
+
+> 逃避解决不了问题
+> js 认真学
+> css 重视
+> html 规范
+
 ### 起因
 
 - 别人的 Readme 写的太好<del>（行了吧）</del>
@@ -130,6 +137,46 @@ render(){
 //竟然从左下角，上去了，虽然他算是home的组件（礼花）
 
 ```
+
+- 我不知道上面那个方法怎么做到的，反正今天看来就是一坨屎，这次换了一种方法，解决了 navbar 选中的问题（看代码 8）(礼花)，完成代码后，需要把内容重新定位
+
+```javascript
+class App extends React.Component {
+  render() {
+    let LayoutRouter = (
+      <Layout>
+        <Switch>
+          <Route exact path="/" component={LoginPage} />
+          <Route path="/home/index" component={Home} />
+          <Route path="/user/index" component={Man_user} />
+          <Route path="/user/update" component={Newuser} />
+          <Route path="/ter/index" component={Man_ter} />
+          <Route path="/ter/ter_info" component={Man_info} />
+          <Route path="/ter/add" component={Newter} />
+          <Route path="/ter/edit_single" component={Single_edit} />
+          <Route path="/ter/edit_batch" component={Batch_edit} />
+          <Route path="/media/index" component={Media} />
+          <Redirect exact from="/home" to="/home/index" />
+          <Redirect exact from="/user" to="/user/index" />
+          <Redirect exact from="/ter" to="/ter/index" />
+        </Switch>
+      </Layout>
+    )
+    return (
+      <Router>
+        <div className="App">
+          <Route path="/login" component={LoginForm} />
+          <Route path="/register" component={Register} />
+          <Route path="/" render={props => LayoutRouter} />
+        </div>
+      </Router>
+    )
+  }
+}
+```
+
+- 标签不要乱用，就是一个`Col`的标签 使我的 navbar 都不能选中
+- margin/padding 不能混用，就是他们两个东西，使我的 navbar 都不能选中
 
 ### 未解决的问题
 
@@ -274,7 +321,7 @@ class B extends React.Component{
 | 3    | 💩   | 👤               |
 | 4    | 💩   | 👤               |
 | 5    | 💩   | 👤               |
-| 6    | 💩   | 👤               |
+| 6    | 🌟   | 👍Hazelnuttt     |
 | 7    | 💩   | 👤               |
 | 8    | 💩   | 👤               |
 | 9    | 💩   | 👤               |

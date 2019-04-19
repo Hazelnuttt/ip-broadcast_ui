@@ -2,16 +2,15 @@ import { Menu, Icon, Col } from 'antd';
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { NavLink } from 'react-router-dom';
-import './home.css';
+import '../layout/index.scss';
 
 const SubMenu = Menu.SubMenu;
 
-class Sider extends React.Component {
+class NavbarMenu extends React.Component {
   // submenu keys of first level
   rootSubmenuKeys = ['sub1', 'sub2', 'sub4'];
-
   state = {
-    selectkeys: ['2'],
+    selectkeys: [],
     openKeys: []
   };
 
@@ -36,11 +35,10 @@ class Sider extends React.Component {
         defaultSelectedKeys={['1']}
         openKeys={this.state.openKeys}
         onOpenChange={this.onOpenChange}
-        //
         className={'menu'}
       >
         <Menu.Item key="1">
-          <NavLink to="/home/user/index">
+          <NavLink to="/home/index" className="home">
             <span>
               <Icon type="home" />
               <span>主面板</span>
@@ -48,7 +46,7 @@ class Sider extends React.Component {
           </NavLink>
         </Menu.Item>
         <Menu.Item key="2">
-          <NavLink to="/home/user/index">
+          <NavLink to="/user/index" activeClassName="user">
             <span>
               <Icon type="solution" />
               <span>用户管理</span>
@@ -56,7 +54,7 @@ class Sider extends React.Component {
           </NavLink>
         </Menu.Item>
         <Menu.Item key="3">
-          <NavLink to="/home/ter/add">
+          <NavLink to="/ter/add" activeClassName="ter">
             <span>
               <Icon type="switcher" />
               <span>终端管理</span>
@@ -123,21 +121,21 @@ class Sider extends React.Component {
             <span>电子地图</span>
           </span>
         </Menu.Item>
-        <Menu.Item key="15">
-          <NavLink to="/home/media">
+        <Menu.Item key="14">
+          <NavLink to="/media/index" activeClassName="media">
             <span>
               <Icon type="mobile" />
               <span>媒体库</span>
             </span>
           </NavLink>
         </Menu.Item>
-        <Menu.Item key="16">
+        <Menu.Item key="15">
           <span>
             <Icon type="notification" />
             <span>录音设备</span>
           </span>
         </Menu.Item>
-        <Menu.Item key="17">
+        <Menu.Item key="16">
           <span>
             <Icon type="setting" />
             <span>系统设置</span>
@@ -148,4 +146,4 @@ class Sider extends React.Component {
   }
 }
 
-export default Sider;
+export default NavbarMenu;

@@ -14,6 +14,14 @@ class Single_edit extends React.Component {
     };
   }
 
+  // getdata() {
+  //   fetch()
+  // }
+
+  // componentDidMount() {
+  //   this.getdata()
+  // }
+
   handleChange = param => {
     this.setState({ ...this.state, ...param });
   };
@@ -52,7 +60,7 @@ class Single_edit extends React.Component {
   render() {
     const { name, ip_address, volume } = this.state;
     return (
-      <div className="tab" style={{ marginLeft: 250, width: 300 }}>
+      <div className="tab" style={{ marginLeft: 240, width: 300 }}>
         <h1>single</h1>
         <label>终端名称</label>
         <Input

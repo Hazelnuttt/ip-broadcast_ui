@@ -1,11 +1,11 @@
 import React from 'react';
-import Home from '../home/home.js';
+import Layout from '../layout/index';
 import fetch from 'node-fetch';
 import { Redirect } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Input, Card, Icon, Radio, Button, message, Form, Select } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
-import '../home/home.css';
+import './user.scss';
 import { USER_A_URL } from '../../utils/api';
 const { Option } = Select;
 const RadioGroup = Radio.Group;
@@ -99,71 +99,69 @@ class Newuser extends React.Component {
     const { username, password } = this.state;
     //console.log('hello')
     return (
-      <Home>
-        <div style={{ margin: 100 }}>
-          <h1 style={{ textAlign: 'center' }}>新建用户</h1>
-          <hr />
+      <div>
+        <h1 style={{ textAlign: 'center' }}>新建用户</h1>
+        <hr />
+        <br />
+        <Card className="ant-card-body" style={{ marginLeft: 580, padding: 0 }}>
+          {/* handlechange方法，浏览器向服务器发送信息(url,method,headers,body),渲染当前状态下的数据 */}
+          {/* handlesubmit方法，服务器响应，(result,message,data)，浏览器渲染数据 */}
+          <label>用户名</label>
+          <Input
+            onChange={e => this.handleChange({ username: e.target.value })}
+            value={
+              this.props.visible ? this.props.data_edit.username : username
+            }
+            style={{ margin: '5px 0' }}
+            placeholder="Enter your username"
+            prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+          />
+          <label>登录密码</label>
+          <Input.Password
+            onChange={e => this.handleChange({ password: e.target.value })}
+            value={
+              this.props.visible ? this.props.data_edit.password : password
+            }
+            style={{ margin: '5px 0' }}
+            placeholder="Enter your username"
+            prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+          />
+
+          <Form style={{ height: 100 }}>
+            <Form.Item layout="inline" label={'用户角色'}>
+              <Select
+                defaultValue={'ROLE_USER'}
+                style={{ width: 100 }}
+                onChange={this.handleIdentifyChange}
+              >
+                {/* {identifyDatas.map(identifyData => (
+                  <Option key={identifyData}>{identifyData}</Option>
+                ))} */}
+                <Option value="ROLE_USER">普通用户</Option>
+                <Option value="ROLE_ADMIN">管理员</Option>
+                <Option value="ROLE_SIP">SIP</Option>
+              </Select>
+            </Form.Item>
+          </Form>
+
+          <RadioGroup onChange={this.onChange} defaultValue={false}>
+            是否记住密码
+            <Radio value={true}>是</Radio>
+            <Radio value={false}>否</Radio>
+          </RadioGroup>
           <br />
-          <Card style={{ width: '300px', margin: 'auto' }}>
-            {/* handlechange方法，浏览器向服务器发送信息(url,method,headers,body),渲染当前状态下的数据 */}
-            {/* handlesubmit方法，服务器响应，(result,message,data)，浏览器渲染数据 */}
-            <label>用户名</label>
-            <Input
-              onChange={e => this.handleChange({ username: e.target.value })}
-              value={
-                this.props.visible ? this.props.data_edit.username : username
-              }
-              style={{ margin: '5px 0' }}
-              placeholder="Enter your username"
-              prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-            />
-            <label>登录密码</label>
-            <Input.Password
-              onChange={e => this.handleChange({ password: e.target.value })}
-              value={
-                this.props.visible ? this.props.data_edit.password : password
-              }
-              style={{ margin: '5px 0' }}
-              placeholder="Enter your username"
-              prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-            />
-
-            <Form>
-              <Form.Item layout="inline" label={'用户角色'}>
-                <Select
-                  defaultValue={'ROLE_USER'}
-                  style={{ width: 100 }}
-                  onChange={this.handleIdentifyChange}
-                >
-                  {/* {identifyDatas.map(identifyData => (
-                      <Option key={identifyData}>{identifyData}</Option>
-                    ))} */}
-                  <Option value="ROLE_USER">普通用户</Option>
-                  <Option value="ROLE_ADMIN">管理员</Option>
-                  <Option value="ROLE_SIP">SIP</Option>
-                </Select>
-              </Form.Item>
-            </Form>
-
-            <RadioGroup onChange={this.onChange} defaultValue={false}>
-              是否记住密码
-              <Radio value={true}>是</Radio>
-              <Radio value={false}>否</Radio>
-            </RadioGroup>
-            <br />
-            <Button
-              type="primary"
-              style={{ marginTop: 10, marginRight: 10 }}
-              onClick={this.handleSubmit}
-            >
-              保存并创建
-            </Button>
-            <Button type="primary" style={{ marginTop: 10 }}>
-              <NavLink to="/home/user/index">放弃</NavLink>
-            </Button>
-          </Card>
-        </div>
-      </Home>
+          <Button
+            type="primary"
+            style={{ marginTop: 10, marginRight: 10 }}
+            onClick={this.handleSubmit}
+          >
+            保存并创建
+          </Button>
+          <Button type="primary" style={{ marginTop: 10 }}>
+            <NavLink to="/home/user/index">放弃</NavLink>
+          </Button>
+        </Card>
+      </div>
     );
   }
 }

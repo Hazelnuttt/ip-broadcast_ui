@@ -1,6 +1,14 @@
 import React from 'react';
 import fetch from 'node-fetch';
-import { Input, Card, Button, Checkbox, Icon, message } from 'antd';
+import {
+  Input,
+  Card,
+  Button,
+  Checkbox,
+  Icon,
+  message,
+  InputNumber
+} from 'antd';
 import { Redirect } from 'react-router';
 import Man_ter from './manage_terminal';
 
@@ -9,7 +17,8 @@ class Newter extends React.Component {
     super(props);
     this.state = {
       name: '',
-      ip_address: ''
+      ip_address: '',
+      volume: 60
     };
   }
   getHome() {
@@ -49,8 +58,16 @@ class Newter extends React.Component {
     this.setState({ ...this.state, ...param });
   };
 
+  handleChangeV = value => {
+    const { volume } = this.state;
+    this.setState({
+      volume: value
+    });
+    // console.log(volume) //这边不知道有没有滞后一个操作
+  };
+
   handleSubmit = () => {
-    const { name, ip_address } = this.state;
+    const { name, ip_address, volume } = this.state;
     fetch('http://198.13.50.147:8099/api/endpoint/add', {
       method: 'post',
       headers: {
@@ -61,7 +78,8 @@ class Newter extends React.Component {
       },
       body: JSON.stringify({
         name,
-        ip_address
+        ip_address,
+        volume
       })
     })
       .then(res => res.json())
@@ -70,7 +88,7 @@ class Newter extends React.Component {
         if (loginSuccess) {
           // 登录成功处理
           // 一个参数也不知···········
-          return <Redirect to="/home/user/index" />;
+          return <Redirect to="/home/ter/ter_info" />;
         } else {
           // 登录失败处理
           message.error(message1);
@@ -80,32 +98,46 @@ class Newter extends React.Component {
   };
 
   render() {
-    const { name, ip_address } = this.state;
+    const { name, ip_address, volume } = this.state;
+    // function onChange(value) {
+    //   console.log('changed', value)
+    // }
     return (
-      <div className="tab" style={{ marginLeft: 250, width: 300 }}>
-        <h1>新建</h1>
-        <label>终端名称</label>
-        <Input
-          onChange={e => this.handleChange({ name: e.target.value })}
-          value={name}
-          style={{ margin: '5px 0' }}
-          placeholder="请输入终端名称"
-        />
-        <label>ip地址</label>
-        <Input
-          onChange={e => this.handleChange({ ip_address: e.target.value })}
-          value={ip_address}
-          style={{ margin: '5px 0' }}
-          placeholder="请输入ip地址"
-        />
-        <Button
-          type="primary"
-          style={{ marginTop: 10, marginRight: 10 }}
-          onClick={this.handleSubmit}
-        >
-          保存
-        </Button>
-      </div>
+      <Man_ter>
+        <div className="tab" style={{ marginLeft: 50, width: 300 }}>
+          <h1>新建</h1>
+          <label>终端名称</label>
+          <Input
+            onChange={e => this.handleChange({ name: e.target.value })}
+            value={name}
+            style={{ margin: '5px 0' }}
+            placeholder="请输入终端名称"
+          />
+          <label>ip地址</label>
+          <Input
+            onChange={e => this.handleChange({ ip_address: e.target.value })}
+            x={ip_address}
+            style={{ margin: '5px 0' }}
+            placeholder="请输入ip地址"
+          />
+          <label>音量</label>
+          <br />
+          <InputNumber
+            min={0}
+            max={100}
+            defaultValue={60}
+            onChange={this.handleChangeV}
+          />
+          ,
+          <Button
+            type="primary"
+            style={{ marginTop: 10, marginRight: 10 }}
+            onClick={this.handleSubmit}
+          >
+            保存
+          </Button>
+        </div>
+      </Man_ter>
     );
   }
 }

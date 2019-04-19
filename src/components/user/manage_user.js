@@ -1,5 +1,5 @@
 import React from 'react';
-import Home from '../home/home.js';
+import Layout from '../layout/index';
 import {
   Form,
   Input,
@@ -15,7 +15,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import { NavLink } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import fetch from 'node-fetch';
-import '../home/home.css';
+import './user.scss';
 import { USER_INFO_URL, USER_F_URL, USER_D_URL } from '../../utils/api';
 const { Option } = Select;
 
@@ -74,9 +74,10 @@ class Man_user extends React.Component {
       });
   }
 
-  componentDidMount() {
-    this.getData();
-  }
+  // componentDidMount() {
+  //   this.props.select
+  //   this.getData()
+  // }
 
   //可能有问题
   handleIdentifyChange = value => {
@@ -107,9 +108,6 @@ class Man_user extends React.Component {
     })
       .then(res => res.json())
       .then(res => {
-        // console.log(res)
-        // console.log(role)
-        // console.log(username)
         const { list, navigatepageNums } = res;
         const { pagination } = this.state;
         pagination.total = navigatepageNums.pages;
@@ -142,7 +140,6 @@ class Man_user extends React.Component {
       console.log(err);
       message.error('网络请求异常!');
     });
-    // console.log(key)
     const data0 = [...this.state.data0];
     this.setState({ data0: data0.filter(item => item.key !== key) });
   };
@@ -216,18 +213,20 @@ class Man_user extends React.Component {
     ];
 
     return (
-      <Home>
-        <Col className={'twofun'}>
-          <span>
-            <Icon type="sync" />
-            <NavLink to="/home/user/index">刷新</NavLink>
-          </span>{' '}
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          <span>
-            <Icon type="plus" />
-            <NavLink to="/home/user/update">新建</NavLink>{' '}
-          </span>
-        </Col>
+      <>
+        <div>
+          <div className={'twofun'}>
+            <span>
+              <Icon type="sync" />
+              <NavLink to="/user/index">刷新</NavLink>
+            </span>{' '}
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <span>
+              <Icon type="plus" />
+              <NavLink to="/user/update">新建</NavLink>{' '}
+            </span>
+          </div>
+        </div>
         <div className={'search'}>
           <Form layout="inline">
             <Form.Item layout="inline" label={'综合筛选'}>
@@ -276,6 +275,7 @@ class Man_user extends React.Component {
         </div>
         <div className="content">
           <Table
+            // className={'content'}
             columns={columns}
             dataSource={data0}
             pagination={{ pageSize: pagination[2] }}
@@ -283,7 +283,7 @@ class Man_user extends React.Component {
             scroll={{ y: 350 }}
           />
         </div>
-      </Home>
+      </>
     );
   }
 }
