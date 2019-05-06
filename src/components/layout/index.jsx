@@ -1,24 +1,27 @@
 import React from 'react';
-import NavbarMenu from './menu.jsx';
-import NavTop from './navtop.jsx';
-import './index.scss';
-import { Col } from 'antd';
+import { Row, Col } from 'antd';
+import Header from '../Header';
+import Footer from '../Footer';
+import NavLeft from '../NavLeft';
+import '../style/index.scss';
+import Home from '../home/home';
 
 class Layout extends React.Component {
-  constructor(props) {
-    super(props);
-  }
   render() {
     return (
-      <div className="top">
-        <Col span={4}>
-          <NavbarMenu />
+      <Row className="container">
+        <Col span="4" className="nav-left">
+          <NavLeft />
         </Col>
-        <Col span={20}>
-          <NavTop />
+        <Col span="20" className="main">
+          <Header />
+          <Row className="content">
+            {/* <Home/> */}
+            {this.props.children}
+          </Row>
+          <Footer />
         </Col>
-        {this.props.children}
-      </div>
+      </Row>
     );
   }
 }

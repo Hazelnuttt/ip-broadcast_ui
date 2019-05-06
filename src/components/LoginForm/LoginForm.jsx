@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Card, Button, Checkbox, Icon, Form, message } from 'antd';
 import { Link } from 'react-router-dom';
+import { Redirect, withRouter } from 'react-router';
 import { LOGIN_URL } from '../../utils/api';
 import './LoginForm.scss';
 
@@ -16,28 +17,39 @@ class BaseLoginForm extends Component {
         this.setState({
           loading: true
         });
-        fetch(LOGIN_URL, {
+
+        fetch('http://localhost:8099/api/auth/login', {
           method: 'POST',
           body: JSON.stringify(values)
         })
-          .then(_res => {
-            console.log(_res);
-            return _res.json();
-          })
           .then(res => {
-            // TODO:
-            // const { loginSuccess, message1, token } = res;
-            // if (loginSuccess) {
-            //   // 登录成功处理
-            //   localStorage.removeItem("usesr_token");
-            //   localStorage.setItem("user_token", token);
-            //   // this.setState({ user: data });
-            //   return <Redirect to="/home/user/index" />;
-            // } else {
-            //   // 登录失败处理
-            //   message.error(message1);
-            // }
+            const token = res.headers.get('token');
+            const msg = res.headers.get('msg');
+            if (msg) {
+              console.log(msg);
+              message.error(msg);
+            } else {
+              localStorage.removeItem('usesr_token');
+              localStorage.setItem('user_token', token);
+              console.log(token);
+              message.success('登陆成功！');
+              return () => <Redirect to="/user/index" />;
+            }
           })
+          //   // .then(res => {
+          //   //   // TODO:
+          //   //   // const { loginSuccess, message1, token } = res
+          //   //   // if (loginSuccess) {
+          //   //   //   // 登录成功处理
+          //   //   //   localStorage.removeItem('usesr_token')
+          //   //   //   localStorage.setItem('user_token', token)
+          //   //   //   // this.setState({ user: data });
+          //   //   //   return <Redirect to="/home/user/index" />
+          //   //   // } else {
+          //   //   //   // 登录失败处理
+          //   //   //   message.error(message1)
+          //   //   // }
+          //   // })
           .catch(err => {
             console.warn(err);
             message.error('网络请求异常!');
@@ -87,7 +99,7 @@ class BaseLoginForm extends Component {
               )}
             </Form.Item>
             <Form.Item>
-              {getFieldDecorator('remember', {
+              {getFieldDecorator('rememberMe', {
                 valuePropName: 'checked',
                 initialValue: true
               })(<Checkbox>记住我</Checkbox>)}

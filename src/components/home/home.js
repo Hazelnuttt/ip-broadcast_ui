@@ -1,9 +1,13 @@
 import React from 'react';
-import Layout from '../layout/index';
+import './index.scss';
 
 class Home extends React.Component {
   render() {
-    return <p>home</p>;
+    return (
+      <div className="home-wrap">
+        <p>lalala来了</p>
+      </div>
+    );
   }
 }
 
