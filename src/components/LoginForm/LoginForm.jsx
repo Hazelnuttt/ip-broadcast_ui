@@ -18,22 +18,22 @@ class BaseLoginForm extends Component {
           loading: true
         });
 
-        fetch('http://localhost:8099/api/auth/login', {
+        fetch('http://198.13.50.147:8099/api/auth/login', {
           method: 'POST',
           body: JSON.stringify(values)
         })
           .then(res => {
             const token = res.headers.get('token');
             const msg = res.headers.get('msg');
-            if (msg) {
-              console.log(msg);
-              message.error(msg);
-            } else {
+            if (msg == 'login_success') {
               localStorage.removeItem('usesr_token');
               localStorage.setItem('user_token', token);
-              console.log(token);
+              console.log(msg);
               message.success('登陆成功！');
               return () => <Redirect to="/user/index" />;
+            } else {
+              console.log(msg);
+              message.error(msg);
             }
           })
           //   // .then(res => {

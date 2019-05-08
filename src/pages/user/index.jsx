@@ -32,6 +32,7 @@ class User extends React.Component {
     fetch('http://198.13.50.147:8099/api/user', {
       method: 'get',
       headers: {
+        'Access-Control-Allow-Origin': 'Authorization',
         Authorization: localStorage.getItem('user_token')
       }
     })
@@ -53,28 +54,41 @@ class User extends React.Component {
   handleSubmit = () => {
     let type = this.state.type;
     let data = this.userForm.props.form.getFieldsValue();
-    console.log(data);
+
+    // let s = {
+    //   language_kind: 0,
+    //   email: ''
+    // }
+
+    var test = JSON.stringify({
+      ...data,
+      language_kind: 0,
+      email: ''
+    });
+
+    // console.log(data)
     if (type == 'add') {
-      fetch('https://localhost:8099/api/user/add', {
-        method: 'post',
+      fetch('http://198.13.50.147:8099/api/user/add', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: localStorage.getItem('user_token')
         },
-        body: {
-          ...data
-        }
+        body: test
       })
         .then(res => res.json())
         .then(res => {
+          console.log(test);
           const { msg } = res;
           if (msg) {
             this.setState({
               isVisible: false
             });
+            console.log(msg);
             message.success('添加成功！');
             this.requireList();
           } else {
+            console.log(msg);
             message.error('添加失败！');
           }
         })
@@ -83,18 +97,23 @@ class User extends React.Component {
           message.error('网络请求异常!');
         });
     } else {
-      fetch('https://localhost:8099/api/user/edit', {
+      var test1 = JSON.stringify({
+        id: this.state.userinfo.id,
+        ...data,
+        language_kind: 0,
+        email: ''
+      });
+      fetch('http://198.13.50.147:8099/api/user/update', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
           Authorization: localStorage.getItem('user_token')
         },
-        body: {
-          ...data
-        }
+        body: test1
       })
         .then(res => res.json())
         .then(res => {
+          console.log(test1);
           const { msg } = res;
           if (msg) {
             this.setState({
@@ -122,7 +141,6 @@ class User extends React.Component {
           fetch(`http://198.13.50.147:8099/api/user/delete/${item.id}`, {
             method: 'post',
             headers: {
-              'Content-Type': 'application/json',
               Authorization: localStorage.getItem('user_token')
             }
           })
@@ -324,16 +342,18 @@ class FilterForm extends React.Component {
     fetch('http://198.13.50.147:8099/api/user/findby', {
       method: 'post',
       headers: {
+        // 'Access-Control-Allow-Origin': 'Authorization',
         'Content-Type': 'application/json',
         Authorization: localStorage.getItem('user_token')
       },
-      body: {
-        ...data
-      }
+      body: JSON.stringify({
+        // ...data
+        name: 'repeat2'
+      })
     })
       .then(res => res.json())
       .then(res => {
-        console.log(res);
+        console.log(res.list);
         // if (res.status == 'success') {
         this.setState({
           loading: false,
@@ -343,7 +363,12 @@ class FilterForm extends React.Component {
             return item;
           })
         });
+        // console.log(list)
         // }
+      })
+      .catch(err => {
+        console.error(err);
+        message.error('网络请求异常!');
       });
   };
 
