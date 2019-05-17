@@ -80,13 +80,16 @@ class User extends React.Component {
         .then(res => {
           console.log(test);
           const { msg } = res;
-          if (msg) {
+          if (msg == 'success') {
             this.setState({
               isVisible: false
             });
             console.log(msg);
             message.success('添加成功！');
             this.requireList();
+          } else if (msg == 'no_permission') {
+            console.log(msg);
+            message.success('没有权限！');
           } else {
             console.log(msg);
             message.error('添加失败！');
@@ -119,8 +122,12 @@ class User extends React.Component {
             this.setState({
               isVisible: false
             });
+            console.log(msg);
             message.success('编辑成功！');
             this.requireList();
+          } else if (msg == 'no_permission') {
+            console.log(msg);
+            message.success('没有权限！');
           } else {
             message.error('编辑失败！');
           }
@@ -219,7 +226,13 @@ class User extends React.Component {
         dataIndex: '',
         key: 'x',
         render: record => (
-          <a onClick={() => this.handleOperator('edit', record)}>编辑</a>
+          <a
+            onClick={() => {
+              this.handleOperator('edit', record);
+            }}
+          >
+            编辑
+          </a>
         )
       },
       {
@@ -251,14 +264,18 @@ class User extends React.Component {
           <Table
             columns={columns}
             dataSource={this.state.list}
-            pagination={this.state.pageNum}
+            // pagination={this.state.pageNum}
+            pagination={2}
             loading={this.state.loading}
           />
         </div>
         <Modal
           title={this.state.title}
           visible={this.state.isVisible}
-          onOk={this.handleSubmit}
+          onOk={() => {
+            this.handleSubmit();
+            this.userForm.props.form.resetFields();
+          }}
           onCancel={() => {
             this.userForm.props.form.resetFields();
             this.setState({
@@ -301,14 +318,14 @@ class UserForm extends React.Component {
     return (
       <Form layout="horizontal">
         <FormItem label="用户名称" {...formItemLayout}>
-          {userinfo && type == 'detail'
+          {userinfo && type == ('detail' || 'edit')
             ? userinfo.username
             : getFieldDecorator('username', {
                 initialValue: userinfo.username
               })(<Input type="text" placeholder="请输入姓名" />)}
         </FormItem>
         <FormItem label="密码" {...formItemLayout}>
-          {userinfo && type == 'detail'
+          {userinfo && type == ('detail' || 'edit')
             ? userinfo.password
             : getFieldDecorator('password', {
                 initialValue: userinfo.password

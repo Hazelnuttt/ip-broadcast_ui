@@ -2,6 +2,8 @@ import React from 'react';
 import '../../utils/api';
 import { NavLink } from 'react-router-dom';
 import {
+  Col,
+  Transfer,
   Card,
   Button,
   Modal,
@@ -22,9 +24,29 @@ class Ter extends React.Component {
     this.state = {
       loading: false,
       list: [],
-      isVisible: false
+      isVisible: false,
+      data_ter: [],
+      targetKeys: []
     };
   }
+
+  handleChange = targetKeys => {
+    this.setState({ targetKeys });
+    console.log(targetKeys);
+  };
+
+  renderItem = item => {
+    console.log(item);
+    const customLabel = (
+      <span className="custom-item">
+        <Col span={8}>{item.endPointName}</Col>
+      </span>
+    );
+    return {
+      label: customLabel, // for displayed item
+      value: item.endPointName // for title and filter matching
+    };
+  };
 
   componentDidMount() {
     this.setState({ loading: true });
@@ -41,9 +63,10 @@ class Ter extends React.Component {
       .then(res => res.json())
       .then(res => {
         this.setState({
+          pageNum: res.pageNum,
           loading: false,
-          list: res.list.map((item, index) => {
-            item.key = index;
+          list: res.list.map(item => {
+            item.key = item.endPointId;
             return item;
           })
         });
@@ -51,9 +74,24 @@ class Ter extends React.Component {
   };
 
   handleSubmit = () => {
+    var enddata = {
+      ...data,
+      srv_ip: null,
+      // call_code: 0,
+      default_volume: 50,
+      dial_volume: 60,
+      shortcut_frequency: 0,
+      shortcut_interval: 0,
+      type: '1',
+      note: null,
+      status: null,
+      version: 0,
+      data: targetKeys
+    };
+    let targetKeys = this.state.targetKeys;
     let type = this.state.type;
-    let data = this.userForTerops.form.getFieldsValue();
-    console.log(data);
+    let data = this.TerForm.props.form.getFieldsValue();
+    console.log(enddata);
     if (type == 'add') {
       fetch('http://198.13.50.147:8099/api/endpoint/add', {
         method: 'post',
@@ -61,9 +99,7 @@ class Ter extends React.Component {
           'Content-Type': 'application/json',
           Authorization: localStorage.getItem('user_token')
         },
-        body: {
-          ...data
-        }
+        body: enddata
       })
         .then(res => res.json())
         .then(res => {
@@ -72,9 +108,11 @@ class Ter extends React.Component {
             this.setState({
               isVisible: false
             });
+            console.log(msg);
             message.success('添加成功！');
             this.requireList();
           } else {
+            console.log(msg);
             message.error('添加失败！');
           }
         })
@@ -83,7 +121,7 @@ class Ter extends React.Component {
           message.error('网络请求异常!');
         });
     } else {
-      fetch('http://198.13.50.147:8099/api/user/edit', {
+      fetch('http://198.13.50.147:8099/api/endpoint/update', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
@@ -100,9 +138,11 @@ class Ter extends React.Component {
             this.setState({
               isVisible: false
             });
+            console.log(msg);
             message.success('编辑成功！');
             this.requireList();
           } else {
+            console.log(msg);
             message.error('编辑失败！');
           }
         })
@@ -136,6 +176,7 @@ class Ter extends React.Component {
           )
             .then(res => res.json())
             .then(res => {
+              console.log(selectedRowKeys);
               const { msg } = res;
               if (msg == 'success') {
                 this.setState({
@@ -179,7 +220,7 @@ class Ter extends React.Component {
       {
         title: 'ID',
         dataIndex: 'endPointId',
-        width: '5%'
+        width: '10%'
       },
       {
         title: '终端名称',
@@ -194,32 +235,12 @@ class Ter extends React.Component {
       {
         title: '呼叫编码',
         dataIndex: 'callCode',
-        width: '15%'
+        width: '25%'
       },
       {
         title: '终端默认音量',
         dataIndex: 'broadcastVolume',
-        width: '8%'
-      },
-      {
-        title: '详情',
-        dataIndex: '',
-        key: 'w',
-        render: () => (
-          <a onClick={() => this.handleOperator('detail', selectedRowKeys)}>
-            查看详情
-          </a>
-        )
-      },
-      {
-        title: '编辑',
-        dataIndex: '',
-        key: 'x',
-        render: () => (
-          <a onClick={() => this.handleOperator('edit', selectedRowKeys)}>
-            编辑
-          </a>
-        )
+        width: '15%'
       }
     ];
     let footer = {};
@@ -243,9 +264,15 @@ class Ter extends React.Component {
           </Button>
           <Button
             type="primary"
-            onClick={() => this.handleOperator('modifyV', selectedRowKeys)}
+            onClick={() => this.handleOperator('detail', selectedRowKeys)}
           >
-            调节音量
+            查看详情
+          </Button>
+          <Button
+            type="primary"
+            onClick={() => this.handleOperator('edit', selectedRowKeys)}
+          >
+            编辑
           </Button>
           <Button
             type="primary"
@@ -257,14 +284,14 @@ class Ter extends React.Component {
         <div className={'content-wrap'}>
           <SelectT
             columns={columns}
-            rowSelection="checkbox"
+            // rowSelection="checkbox"
             updateSelectedItem={SelectK.updateSelectedItem.bind(this)}
             selectedRowKeys={this.state.selectedRowKeys}
             selectedRows={this.state.selectedRows}
             selectedItem={this.state.selectedRows}
             rowKey={this.state.rowKey}
             dataSource={this.state.list}
-            // pagination={this.state.pagination}
+            pagination={this.state.pageNum}
           />
         </div>
         <Modal
@@ -285,6 +312,19 @@ class Ter extends React.Component {
             terinfo={this.state.terinfo}
             type={this.state.type}
             wrappedComponentRef={inst => (this.TerForm = inst)}
+          />
+          <Transfer
+            dataSource={this.state.list}
+            showSearch
+            titles={[' [复制音量]', '[到此终端]']}
+            listStyle={{
+              width: 210,
+              height: 300
+            }}
+            operations={['to right', 'to left']}
+            targetKeys={this.state.targetKeys}
+            onChange={this.handleChange}
+            render={item => item.endPointName}
           />
         </Modal>
       </>
@@ -312,6 +352,7 @@ class TerForm extends React.Component {
     const type = this.props.type;
     return (
       <Form layout="horizontal">
+        {/**不需要 */}
         {/* <FormItem label="ip使用者" {...formItemLayout}>
           {terinfo && type == 'detail'
             ? terinfo.username
