@@ -1,7 +1,7 @@
 import React from 'react';
 import '../../utils/api';
-import { NavLink } from 'react-router-dom';
 import {
+  Pagination,
   Card,
   Button,
   Table,
@@ -12,6 +12,7 @@ import {
   Input,
   Select
 } from 'antd';
+import './index.scss';
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -19,6 +20,7 @@ class User extends React.Component {
   state = {
     loading: false,
     pageNum: {},
+    pageNumber: [],
     list: [],
     isVisible: false
   };
@@ -40,8 +42,8 @@ class User extends React.Component {
       .then(res => {
         // if (res.status == 'success') {
         this.setState({
+          total: res.total,
           loading: false,
-          pageNum: res.pageNum,
           list: res.list.map((item, index) => {
             item.key = index;
             return item;
@@ -54,11 +56,6 @@ class User extends React.Component {
   handleSubmit = () => {
     let type = this.state.type;
     let data = this.userForm.props.form.getFieldsValue();
-
-    // let s = {
-    //   language_kind: 0,
-    //   email: ''
-    // }
 
     var test = JSON.stringify({
       ...data,
@@ -118,13 +115,13 @@ class User extends React.Component {
         .then(res => {
           console.log(test1);
           const { msg } = res;
-          if (msg) {
+          if (msg == 'success') {
             this.setState({
               isVisible: false
             });
             console.log(msg);
             message.success('编辑成功！');
-            this.requireList();
+            this.onChange(this.state.pageNumber);
           } else if (msg == 'no_permission') {
             console.log(msg);
             message.success('没有权限！');
@@ -160,7 +157,7 @@ class User extends React.Component {
                 });
                 console.log(msg);
                 message.success('删除成功！');
-                this.requireList();
+                this.onChange(this.state.pageNumber);
               } else {
                 console.log(msg);
                 message.error('删除失败！');
@@ -186,6 +183,34 @@ class User extends React.Component {
         type
       });
     }
+  };
+
+  onChange = pageNumber => {
+    this.setState({
+      pageNumber,
+      loading: true
+    });
+    fetch(`http://198.13.50.147:8099/api/user?page=${pageNumber}`, {
+      method: 'get',
+      headers: {
+        'Access-Control-Allow-Origin': 'Authorization',
+        Authorization: localStorage.getItem('user_token')
+      }
+    })
+      .then(res => res.json())
+      .then(res => {
+        console.log(`http://198.13.50.147:8099/api/user?page=${pageNumber}`);
+        // if (res.status == 'success') {
+        this.setState({
+          total: res.total,
+          loading: false,
+          list: res.list.map((item, index) => {
+            item.key = index;
+            return item;
+          })
+        });
+        // }
+      });
   };
 
   render() {
@@ -250,6 +275,7 @@ class User extends React.Component {
         footer: null
       };
     }
+
     return (
       <>
         <Card>
@@ -264,9 +290,14 @@ class User extends React.Component {
           <Table
             columns={columns}
             dataSource={this.state.list}
-            // pagination={this.state.pageNum}
-            pagination={2}
+            pagination={false}
             loading={this.state.loading}
+          />
+          <Pagination
+            className="pagination"
+            defaultCurrent={1}
+            total={this.state.total}
+            onChange={this.onChange}
           />
         </div>
         <Modal
