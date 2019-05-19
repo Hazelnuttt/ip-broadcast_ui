@@ -1,7 +1,7 @@
 import React from 'react';
 import { Redirect } from 'react-router';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import Home from './components/home/home';
+import Home from './components/home';
 import Layout from './components/Layout';
 import LoginPage from './components/LoginPage';
 import LoginForm from './components/LoginForm/LoginForm';
@@ -29,7 +29,7 @@ class App extends React.Component {
           <Route path="/home/index" component={Home} />
           <Route path="/user/index" component={User} />
           <Route path="/ter/index" component={Ter} />
-          <Redirect exact from="/home" to="/home/index" />
+          <Redirect exact from="/" to="/home/index" />
           <Redirect exact from="/user" to="/user/index" />
           <Redirect exact from="/ter" to="/ter/index" />
         </Switch>

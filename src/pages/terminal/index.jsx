@@ -27,7 +27,8 @@ class Ter extends React.Component {
       loading: false,
       list: [],
       isVisible: false,
-      targetKeys: []
+      targetKeys: [],
+      isLogin: true
     };
   }
 
@@ -45,14 +46,18 @@ class Ter extends React.Component {
     })
       .then(res => res.json())
       .then(res => {
-        this.setState({
-          total: res.total,
-          loading: false,
-          list: res.list.map(item => {
-            item.key = item.endPointId;
-            return item;
-          })
-        });
+        if (res) {
+          this.setState({
+            total: res.total,
+            loading: false,
+            list: res.list.map((item, index) => {
+              item.key = index;
+              return item;
+            })
+          });
+        } else {
+          this.setState({ isLogin: false });
+        }
       });
   };
 
@@ -70,7 +75,7 @@ class Ter extends React.Component {
     );
     return {
       label: customLabel, // for displayed item
-      value: item.endPointName // for title and filter matching
+      value: item.endPointName // for title and *filter matching*
     };
   };
 
@@ -92,6 +97,7 @@ class Ter extends React.Component {
       version: 0,
       data: targetKeys
     };
+
     if (type == 'add') {
       console.log(enddata1);
       fetch('http://198.13.50.147:8099/api/endpoint/add', {
@@ -114,7 +120,7 @@ class Ter extends React.Component {
             this.requireList();
           } else if (msg == 'no_permission') {
             console.log(msg);
-            message.success('没有权限！');
+            message.error('没有权限！');
           } else {
             console.log(msg);
             message.error('添加失败！');
@@ -128,14 +134,14 @@ class Ter extends React.Component {
       var enddata2 = {
         id: this.state.terinfo.endPointId,
         ...data,
-        srv_ip: null,
+        srv_ip: '',
         default_volume: 50,
         dial_volume: 60,
         shortcut_frequency: 0,
         shortcut_interval: 0,
         type: '1',
-        note: null,
-        status: null,
+        note: '',
+        status: 0,
         version: 0,
         data: targetKeys
       };
@@ -146,21 +152,23 @@ class Ter extends React.Component {
           'Content-Type': 'application/json',
           Authorization: localStorage.getItem('user_token')
         },
-        body: enddata2
+        body: JSON.stringify(enddata2)
       })
         .then(res => res.json())
         .then(res => {
-          const { msg } = res;
+          const { msg, msg2 } = res;
+          console.log(msg2);
           if (msg == 'success') {
             this.setState({
               isVisible: false
             });
             console.log(msg);
+            message.success(msg2);
             message.success('编辑成功！');
             this.onChange(this.state.pageNumber);
           } else if (msg == 'no_permission') {
             console.log(msg);
-            message.success('没有权限！');
+            message.error('没有权限！');
           } else {
             console.log(msg);
             message.error('编辑失败！');
@@ -179,7 +187,6 @@ class Ter extends React.Component {
     console.log(selectedItem);
     console.log(selectedRowKeys);
 
-    // let item = record
     if (type == 'delete') {
       Modal.confirm({
         title: '确定要删除此用户吗？',
@@ -265,6 +272,7 @@ class Ter extends React.Component {
   };
 
   render() {
+    const { isLogin } = this.state;
     const { selectedRowKeys } = this.state;
     const columns = [
       {
@@ -299,7 +307,9 @@ class Ter extends React.Component {
         footer: null
       };
     }
-    return (
+    return isLogin ? (
+      <h1>未登录</h1>
+    ) : (
       <>
         <Card>
           <FilterForm />
@@ -353,7 +363,14 @@ class Ter extends React.Component {
         <Modal
           title={this.state.title}
           visible={this.state.isVisible}
-          onOk={this.handleSubmit}
+          onOk={() => {
+            this.handleSubmit();
+            this.TerForm.props.form.resetFields();
+            this.setState({
+              isVisible: false,
+              terinfo: ''
+            });
+          }}
           onCancel={() => {
             this.TerForm.props.form.resetFields();
             this.setState({
@@ -417,7 +434,7 @@ class TerForm extends React.Component {
         <FormItem label="IP地址" {...formItemLayout}>
           {terinfo && type == 'detail'
             ? terinfo.ipAddress
-            : getFieldDecorator('ip_adr', {
+            : getFieldDecorator('ip_addr', {
                 initialValue: terinfo.ipAddress
               })(<Input type="text" placeholder="请输入ip地址" />)}
         </FormItem>

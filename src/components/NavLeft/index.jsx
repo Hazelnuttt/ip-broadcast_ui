@@ -52,7 +52,11 @@ class NavLeft extends React.Component {
             <h1>IP-BROADCAST MS</h1>
           </div>
         </NavLink>
-        <Menu onClick={this.handleClick} theme="dark">
+        <Menu
+          onClick={this.handleClick}
+          theme="dark"
+          defaultSelectedKeys={['/home/index']}
+        >
           {this.state.menuTreeNode}
         </Menu>
       </div>

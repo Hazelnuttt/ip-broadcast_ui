@@ -7,7 +7,8 @@ import './LoginForm.scss';
 
 class BaseLoginForm extends Component {
   state = {
-    loading: false
+    loading: false,
+    redirectToReferrer: false
   };
 
   handleSubmit = e => {
@@ -15,41 +16,32 @@ class BaseLoginForm extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         this.setState({
-          loading: true
+          loading: true,
+          redirectToReferrer: false
         });
-
         fetch('http://198.13.50.147:8099/api/auth/login', {
           method: 'POST',
           body: JSON.stringify(values)
         })
           .then(res => {
+            // TODO:
+            // const username = ... username本不需要后端传过来
+            // const role = ....... role 其实我是想通过之后redux, 能否前端做个简单的判断权限
             const token = res.headers.get('token');
             const msg = res.headers.get('msg');
             if (msg == 'login_success') {
               localStorage.removeItem('usesr_token');
               localStorage.setItem('user_token', token);
               console.log(msg);
+              this.setState({
+                redirectToReferrer: true
+              });
               message.success('登陆成功！');
-              return () => <Redirect to="/user/index" />;
             } else {
               console.log(msg);
               message.error(msg);
             }
           })
-          //   // .then(res => {
-          //   //   // TODO:
-          //   //   // const { loginSuccess, message1, token } = res
-          //   //   // if (loginSuccess) {
-          //   //   //   // 登录成功处理
-          //   //   //   localStorage.removeItem('usesr_token')
-          //   //   //   localStorage.setItem('user_token', token)
-          //   //   //   // this.setState({ user: data });
-          //   //   //   return <Redirect to="/home/user/index" />
-          //   //   // } else {
-          //   //   //   // 登录失败处理
-          //   //   //   message.error(message1)
-          //   //   // }
-          //   // })
           .catch(err => {
             console.warn(err);
             message.error('网络请求异常!');
@@ -62,10 +54,12 @@ class BaseLoginForm extends Component {
       }
     });
   };
-
   render() {
     const { getFieldDecorator } = this.props.form;
-    return (
+    const { redirectToReferrer } = this.state;
+    return redirectToReferrer ? (
+      <Redirect to="/home" />
+    ) : (
       <div className="LoginForm">
         <Card
           title="登录"

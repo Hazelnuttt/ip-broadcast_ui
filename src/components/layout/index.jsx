@@ -4,7 +4,7 @@ import Header from '../Header';
 import Footer from '../Footer';
 import NavLeft from '../NavLeft';
 import '../style/index.scss';
-import Home from '../home/home';
+// import Home from '../home/home';
 
 class Layout extends React.Component {
   render() {

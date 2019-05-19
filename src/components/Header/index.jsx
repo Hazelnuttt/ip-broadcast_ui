@@ -20,6 +20,8 @@ class Header extends React.Component {
             <Col span={24}>
               <span>欢迎，{this.state.username}</span>
               <NavLink to="/login" className={'layout'}>
+                {localStorage.removeItem('usesr_token')}
+                {/**有问题 */}
                 退出
               </NavLink>
             </Col>

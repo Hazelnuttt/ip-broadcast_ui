@@ -5,7 +5,6 @@ import {
   Card,
   Button,
   Table,
-  Popconfirm,
   Modal,
   message,
   Form,
@@ -19,10 +18,10 @@ const { Option } = Select;
 class User extends React.Component {
   state = {
     loading: false,
-    pageNum: {},
     pageNumber: [],
     list: [],
-    isVisible: false
+    isVisible: false,
+    isLogin: true
   };
 
   componentDidMount() {
@@ -34,21 +33,26 @@ class User extends React.Component {
     fetch('http://198.13.50.147:8099/api/user', {
       method: 'get',
       headers: {
+        //第一条不明原因，貌似后端跨域问题
         'Access-Control-Allow-Origin': 'Authorization',
         Authorization: localStorage.getItem('user_token')
       }
     })
       .then(res => res.json())
       .then(res => {
-        // if (res.status == 'success') {
-        this.setState({
-          total: res.total,
-          loading: false,
-          list: res.list.map((item, index) => {
-            item.key = index;
-            return item;
-          })
-        });
+        // if (res.status == 'success') { 不规范之处：1.status 2.code
+        if (res) {
+          this.setState({
+            total: res.total,
+            loading: false,
+            list: res.list.map((item, index) => {
+              item.key = index;
+              return item;
+            })
+          });
+        } else {
+          this.setState({ isLogin: false });
+        }
         // }
       });
   };
@@ -58,13 +62,14 @@ class User extends React.Component {
     let data = this.userForm.props.form.getFieldsValue();
 
     var test = JSON.stringify({
+      //由于 1.id等一些外加信息的传递 2.无用信息的传递
       ...data,
       language_kind: 0,
       email: ''
     });
 
-    // console.log(data)
     if (type == 'add') {
+      this.userForm.props.form.resetFields();
       fetch('http://198.13.50.147:8099/api/user/add', {
         method: 'POST',
         headers: {
@@ -86,7 +91,7 @@ class User extends React.Component {
             this.requireList();
           } else if (msg == 'no_permission') {
             console.log(msg);
-            message.success('没有权限！');
+            message.error('没有权限！');
           } else {
             console.log(msg);
             message.error('添加失败！');
@@ -116,15 +121,12 @@ class User extends React.Component {
           console.log(test1);
           const { msg } = res;
           if (msg == 'success') {
-            this.setState({
-              isVisible: false
-            });
             console.log(msg);
             message.success('编辑成功！');
             this.onChange(this.state.pageNumber);
           } else if (msg == 'no_permission') {
             console.log(msg);
-            message.success('没有权限！');
+            message.error('没有权限！');
           } else {
             message.error('编辑失败！');
           }
@@ -214,6 +216,7 @@ class User extends React.Component {
   };
 
   render() {
+    const { isLogin } = this.state;
     const columns = [
       {
         title: 'ID',
@@ -276,7 +279,9 @@ class User extends React.Component {
       };
     }
 
-    return (
+    return isLogin ? (
+      <h1>未登录</h1>
+    ) : (
       <>
         <Card>
           <FilterForm />
@@ -306,6 +311,10 @@ class User extends React.Component {
           onOk={() => {
             this.handleSubmit();
             this.userForm.props.form.resetFields();
+            this.setState({
+              isVisible: false,
+              userinfo: ''
+            });
           }}
           onCancel={() => {
             this.userForm.props.form.resetFields();
@@ -349,14 +358,14 @@ class UserForm extends React.Component {
     return (
       <Form layout="horizontal">
         <FormItem label="用户名称" {...formItemLayout}>
-          {userinfo && type == ('detail' || 'edit')
+          {userinfo && type == 'detail'
             ? userinfo.username
             : getFieldDecorator('username', {
                 initialValue: userinfo.username
               })(<Input type="text" placeholder="请输入姓名" />)}
         </FormItem>
         <FormItem label="密码" {...formItemLayout}>
-          {userinfo && type == ('detail' || 'edit')
+          {userinfo && type == 'detail'
             ? userinfo.password
             : getFieldDecorator('password', {
                 initialValue: userinfo.password
