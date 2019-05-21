@@ -16,6 +16,7 @@ import {
 import './index.scss';
 import SelectT from '../../components/SelectT';
 import SelectK from '../../components/SelectK';
+import { Redirect } from 'react-router';
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -46,18 +47,26 @@ class Ter extends React.Component {
     })
       .then(res => res.json())
       .then(res => {
-        if (res) {
-          this.setState({
-            total: res.total,
-            loading: false,
-            list: res.list.map((item, index) => {
-              item.key = index;
-              return item;
-            })
-          });
-        } else {
+        this.setState({
+          total: res.total,
+          loading: false,
+          list: res.list.map((item, index) => {
+            item.key = index;
+            return item;
+          })
+        });
+      })
+      .catch(err => {
+        if (err == 'SyntaxError: Unexpected token = in JSON at position 6') {
+          message.error('您未登录！');
           this.setState({ isLogin: false });
+        } else {
+          console.log(err);
+          message.error('网络请求异常！');
         }
+      })
+      .finally(() => {
+        this.setState({ loading: false });
       });
   };
 
@@ -307,8 +316,8 @@ class Ter extends React.Component {
         footer: null
       };
     }
-    return isLogin ? (
-      <h1>未登录</h1>
+    return isLogin == false ? (
+      <Redirect to="/login" />
     ) : (
       <>
         <Card>

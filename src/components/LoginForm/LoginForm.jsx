@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Card, Button, Checkbox, Icon, Form, message } from 'antd';
 import { Link } from 'react-router-dom';
-import { Redirect, withRouter } from 'react-router';
+import { Redirect } from 'react-router';
 import { LOGIN_URL } from '../../utils/api';
 import './LoginForm.scss';
 

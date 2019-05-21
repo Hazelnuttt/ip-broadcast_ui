@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Layout } from 'antd';
+import { Row, Col, Layout, Button } from 'antd';
 import { NavLink } from 'react-router-dom';
 import './index.scss';
 import { connect } from 'react-redux';
@@ -20,9 +20,13 @@ class Header extends React.Component {
             <Col span={24}>
               <span>欢迎，{this.state.username}</span>
               <NavLink to="/login" className={'layout'}>
-                {localStorage.removeItem('usesr_token')}
-                {/**有问题 */}
-                退出
+                <Button
+                  onClick={() => {
+                    localStorage.removeItem('user_token');
+                  }}
+                >
+                  退出
+                </Button>
               </NavLink>
             </Col>
           </Row>

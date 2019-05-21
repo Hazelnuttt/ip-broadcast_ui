@@ -11,6 +11,7 @@ import {
   Input,
   Select
 } from 'antd';
+import { Redirect } from 'react-router';
 import './index.scss';
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -41,19 +42,28 @@ class User extends React.Component {
       .then(res => res.json())
       .then(res => {
         // if (res.status == 'success') { 不规范之处：1.status 2.code
-        if (res) {
-          this.setState({
-            total: res.total,
-            loading: false,
-            list: res.list.map((item, index) => {
-              item.key = index;
-              return item;
-            })
-          });
-        } else {
-          this.setState({ isLogin: false });
-        }
+        this.setState({
+          total: res.total,
+          loading: false,
+          list: res.list.map(item => {
+            item.key = item.id;
+            return item;
+          })
+        });
+
         // }
+      })
+      .catch(err => {
+        if (err == 'SyntaxError: Unexpected token = in JSON at position 6') {
+          message.error('您未登录！');
+          this.setState({ isLogin: false });
+        } else {
+          console.log(err);
+          message.error('网络请求异常！');
+        }
+      })
+      .finally(() => {
+        this.setState({ loading: false });
       });
   };
 
@@ -141,6 +151,7 @@ class User extends React.Component {
   handleOperator = (type, record) => {
     let item = record;
     if (type == 'delete') {
+      console.log(item);
       Modal.confirm({
         title: '确定要删除此用户吗？',
         onOk: () => {
@@ -279,8 +290,8 @@ class User extends React.Component {
       };
     }
 
-    return isLogin ? (
-      <h1>未登录</h1>
+    return isLogin == false ? (
+      <Redirect to="/login" />
     ) : (
       <>
         <Card>
