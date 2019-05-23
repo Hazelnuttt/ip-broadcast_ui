@@ -5,12 +5,11 @@
 ## components
 
 - Layout
-  -Footer
-  -Header
-  -Navleft
+  1.  Footer
+  2.  Header
+  3.  Navleft
 - LoginForm
 - SelectK
-- SelectT
 
 ## pages
 
@@ -23,11 +22,12 @@
 - delete
 - edit
 - search
+- login in/out
 
 ### QS
 
-1. auth(restrict power)
+1. auth(restrict power) [1.3.类似]
 2. <del>redirect fail</del>
 3. redux （后端 -> 没有权限 传来 msg) (前端 -> 根据身份，把其中一些按钮 disable)
 4. 异步加载（下拉加载）
-5. Table 的 key 混乱
+5. <del>Table 的 key 混乱</del>

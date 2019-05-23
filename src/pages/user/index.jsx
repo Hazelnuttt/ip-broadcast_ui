@@ -17,13 +17,16 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 class User extends React.Component {
-  state = {
-    loading: false,
-    pageNumber: [],
-    list: [],
-    isVisible: false,
-    isLogin: true
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: false,
+      pageNumber: [],
+      list: [],
+      isVisible: false,
+      isLogin: true
+    };
+  }
 
   componentDidMount() {
     this.setState({ loading: true });
@@ -46,7 +49,7 @@ class User extends React.Component {
           total: res.total,
           loading: false,
           list: res.list.map(item => {
-            item.key = item.id;
+            item.key = item.id; //之前写的是 item.key=item.index 我晓得index是索引，但它对于我的数据来说是个啥，把key变为id后，也不用一直依赖于record.id了，直接key就行了
             return item;
           })
         });
@@ -151,7 +154,7 @@ class User extends React.Component {
   handleOperator = (type, record) => {
     let item = record;
     if (type == 'delete') {
-      console.log(item);
+      console.log(item.key);
       Modal.confirm({
         title: '确定要删除此用户吗？',
         onOk: () => {
@@ -198,33 +201,16 @@ class User extends React.Component {
     }
   };
 
-  onChange = pageNumber => {
+  transferMsg(res) {
     this.setState({
-      pageNumber,
-      loading: true
+      total: res.total,
+      loading: false,
+      list: res.list.map(item => {
+        item.key = item.id;
+        return item;
+      })
     });
-    fetch(`http://198.13.50.147:8099/api/user?page=${pageNumber}`, {
-      method: 'get',
-      headers: {
-        'Access-Control-Allow-Origin': 'Authorization',
-        Authorization: localStorage.getItem('user_token')
-      }
-    })
-      .then(res => res.json())
-      .then(res => {
-        console.log(`http://198.13.50.147:8099/api/user?page=${pageNumber}`);
-        // if (res.status == 'success') {
-        this.setState({
-          total: res.total,
-          loading: false,
-          list: res.list.map((item, index) => {
-            item.key = index;
-            return item;
-          })
-        });
-        // }
-      });
-  };
+  }
 
   render() {
     const { isLogin } = this.state;
@@ -295,7 +281,7 @@ class User extends React.Component {
     ) : (
       <>
         <Card>
-          <FilterForm />
+          <FilterForm transferMsg={res => this.transferMsg(res)} />
         </Card>
         <Card style={{ marginTop: 10 }}>
           <Button type="primary" onClick={() => this.handleOperator('add')}>
@@ -403,10 +389,9 @@ class UserForm extends React.Component {
 UserForm = Form.create({})(UserForm);
 
 class FilterForm extends React.Component {
-  handleSearch = () => {
+  handleFindby = () => {
     let data = this.props.form.getFieldsValue();
     console.log(data);
-    //查询有点问题
     fetch('http://198.13.50.147:8099/api/user/findby', {
       method: 'post',
       headers: {
@@ -415,24 +400,12 @@ class FilterForm extends React.Component {
         Authorization: localStorage.getItem('user_token')
       },
       body: JSON.stringify({
-        // ...data
-        name: 'repeat2'
+        ...data
       })
     })
       .then(res => res.json())
       .then(res => {
-        console.log(res.list);
-        // if (res.status == 'success') {
-        this.setState({
-          loading: false,
-          pageNum: res.pageNum,
-          list: res.list.map((item, index) => {
-            item.key = index;
-            return item;
-          })
-        });
-        // console.log(list)
-        // }
+        this.props.transferMsg(res);
       })
       .catch(err => {
         console.error(err);
@@ -440,6 +413,32 @@ class FilterForm extends React.Component {
       });
   };
 
+  requireList = () => {
+    fetch('http://198.13.50.147:8099/api/user', {
+      method: 'get',
+      headers: {
+        //第一条不明原因，貌似后端跨域问题
+        'Access-Control-Allow-Origin': 'Authorization',
+        Authorization: localStorage.getItem('user_token')
+      }
+    })
+      .then(res => res.json())
+      .then(res => {
+        this.props.transferMsg(res);
+      })
+      .catch(err => {
+        if (err == 'SyntaxError: Unexpected token = in JSON at position 6') {
+          message.error('您未登录！');
+          this.setState({ isLogin: false });
+        } else {
+          console.log(err);
+          message.error('网络请求异常！');
+        }
+      })
+      .finally(() => {
+        this.setState({ loading: false });
+      });
+  };
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -460,12 +459,12 @@ class FilterForm extends React.Component {
         <FormItem>
           <Button
             type="primary"
-            onClick={this.handleSearch}
+            onClick={this.handleFindby}
             style={{ margin: '0 20px' }}
           >
             查询
           </Button>
-          <Button>重置</Button>
+          <Button onClick={this.requireList}>重置</Button>
         </FormItem>
       </Form>
     );

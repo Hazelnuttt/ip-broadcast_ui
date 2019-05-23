@@ -2,7 +2,6 @@ import React from 'react';
 import '../../utils/api';
 import {
   Pagination,
-  Col,
   Transfer,
   Card,
   Button,
@@ -11,10 +10,10 @@ import {
   Form,
   Input,
   Select,
-  InputNumber
+  InputNumber,
+  Table
 } from 'antd';
 import './index.scss';
-import SelectT from '../../components/SelectT';
 import SelectK from '../../components/SelectK';
 import { Redirect } from 'react-router';
 const FormItem = Form.Item;
@@ -51,7 +50,7 @@ class Ter extends React.Component {
           total: res.total,
           loading: false,
           list: res.list.map((item, index) => {
-            item.key = index;
+            item.key = item.endPointId;
             return item;
           })
         });
@@ -73,19 +72,6 @@ class Ter extends React.Component {
   handleChange = targetKeys => {
     this.setState({ targetKeys });
     console.log(targetKeys);
-  };
-
-  renderItem = item => {
-    console.log(item);
-    const customLabel = (
-      <span className="custom-item">
-        <Col span={8}>{item.endPointName}</Col>
-      </span>
-    );
-    return {
-      label: customLabel, // for displayed item
-      value: item.endPointName // for title and *filter matching*
-    };
   };
 
   handleSubmit = () => {
@@ -280,6 +266,24 @@ class Ter extends React.Component {
       });
   };
 
+  onSelectChange = (selectedRowKeys, selectedRows) => {
+    this.setState({
+      selectedRowKeys,
+      selectedItem: selectedRows[0]
+    });
+  };
+
+  transferMsg(res) {
+    this.setState({
+      total: res.total,
+      loading: false,
+      list: res.list.map(item => {
+        item.key = item.id;
+        return item;
+      })
+    });
+  }
+
   render() {
     const { isLogin } = this.state;
     const { selectedRowKeys } = this.state;
@@ -316,12 +320,21 @@ class Ter extends React.Component {
         footer: null
       };
     }
+
+    const rowSelection = {
+      type: 'radio',
+      selectedRowKeys,
+      onChange: this.onSelectChange,
+      onSelect: (record, selected, selectedRows) => {
+        console.log('...');
+      }
+    };
     return isLogin == false ? (
       <Redirect to="/login" />
     ) : (
       <>
         <Card>
-          <FilterForm />
+          <FilterForm transferMsg={res => this.transferMsg(res)} />
         </Card>
         <Card style={{ marginTop: 10 }}>
           <Button
@@ -351,8 +364,9 @@ class Ter extends React.Component {
           </Button>
         </Card>
         <div className={'content-wrap'}>
-          <SelectT
+          <Table
             columns={columns}
+            rowSelection={rowSelection}
             loading={this.state.loading}
             updateSelectedItem={SelectK.updateSelectedItem.bind(this)}
             selectedRowKeys={this.state.selectedRowKeys}
@@ -414,7 +428,6 @@ class Ter extends React.Component {
   }
 }
 export default Ter;
-
 class TerForm extends React.Component {
   getState = ROLE => {
     return {
@@ -458,8 +471,8 @@ class TerForm extends React.Component {
           {terinfo && type == 'detail'
             ? terinfo.broadcastVolume
             : getFieldDecorator('broadcast_volume', {
-                initialValue: terinfo.broadcastVolume
-              })(<InputNumber min={0} max={100} defaultValue={60} />)}
+                initialValue: terinfo.broadcastVolume || 60
+              })(<InputNumber min={0} max={100} />)}
         </FormItem>
       </Form>
     );
@@ -468,41 +481,61 @@ class TerForm extends React.Component {
 TerForm = Form.create({})(TerForm);
 
 class FilterForm extends React.Component {
-  handleSearch = () => {
+  handleFindby = () => {
     let data = this.props.form.getFieldsValue();
     console.log(data);
     //查询有点问题
     fetch('http://198.13.50.147:8099/api/endpoint/findby', {
       method: 'post',
       headers: {
+        // 'Access-Control-Allow-Origin': 'Authorization',
         'Content-Type': 'application/json',
         Authorization: localStorage.getItem('user_token')
       },
-      body: {
+      body: JSON.stringify({
         ...data
+      })
+    })
+      .then(res => res.json())
+      .then(res => {
+        this.props.transferMsg(res);
+      })
+      .catch(err => {
+        console.error(err);
+        message.error('网络请求异常!');
+      });
+  };
+
+  requireList = () => {
+    fetch('http://198.13.50.147:8099/api/endpoint', {
+      method: 'get',
+      headers: {
+        Authorization: localStorage.getItem('user_token')
       }
     })
       .then(res => res.json())
       .then(res => {
-        console.log(res);
-        // if (res.status == 'success') {
-        this.setState({
-          loading: false,
-          pageNum: res.pageNum,
-          list: res.list.map((item, index) => {
-            item.key = index;
-            return item;
-          })
-        });
-        // }
+        this.props.transferMsg(res);
+      })
+      .catch(err => {
+        if (err == 'SyntaxError: Unexpected token = in JSON at position 6') {
+          message.error('您未登录！');
+          this.setState({ isLogin: false });
+        } else {
+          console.log(err);
+          message.error('网络请求异常！');
+        }
+      })
+      .finally(() => {
+        this.setState({ loading: false });
       });
   };
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
-      <Form layout="inline" onSubmit={this.handleSearch}>
+      <Form layout="inline">
         <FormItem label="终端名称">
-          {getFieldDecorator('endPointName')(<Input placeholder="用户名" />)}
+          {getFieldDecorator('name')(<Input placeholder="用户名" />)}
         </FormItem>
         <FormItem label="ip地址">
           {getFieldDecorator('ipAddress')(<Input placeholder="ip地址" />)}
@@ -510,12 +543,12 @@ class FilterForm extends React.Component {
         <FormItem>
           <Button
             type="primary"
-            onClick={this.handleSearch}
+            onClick={this.handleFindby}
             style={{ margin: '0 20px' }}
           >
             查询
           </Button>
-          <Button>重置</Button>
+          <Button onClick={this.requireList}>重置</Button>
         </FormItem>
       </Form>
     );
