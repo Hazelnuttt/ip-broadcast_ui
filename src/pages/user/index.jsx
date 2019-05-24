@@ -201,6 +201,34 @@ class User extends React.Component {
     }
   };
 
+  onChange = pageNumber => {
+    this.setState({
+      pageNumber,
+      loading: true
+    });
+    fetch(`http://198.13.50.147:8099/api/user?page=${pageNumber}`, {
+      method: 'get',
+      headers: {
+        'Access-Control-Allow-Origin': 'Authorization',
+        Authorization: localStorage.getItem('user_token')
+      }
+    })
+      .then(res => res.json())
+      .then(res => {
+        console.log(`http://198.13.50.147:8099/api/user?page=${pageNumber}`);
+        // if (res.status == 'success') {
+        this.setState({
+          total: res.total,
+          loading: false,
+          list: res.list.map((item, index) => {
+            item.key = index;
+            return item;
+          })
+        });
+        // }
+      });
+  };
+
   transferMsg(res) {
     this.setState({
       total: res.total,
