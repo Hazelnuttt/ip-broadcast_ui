@@ -112,7 +112,7 @@ class Ter extends React.Component {
             });
             console.log(msg);
             message.success('添加成功！');
-            this.requireList();
+            this.onChange(this.state.pageNumber);
           } else if (msg == 'no_permission') {
             console.log(msg);
             message.error('没有权限！');
